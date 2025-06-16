@@ -1,23 +1,26 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
+# ✅ Dependencies - still ignore
 /node_modules
 /.pnp
 .pnp.js
 
-# testing
+# ✅ Testing
 /coverage
 
-# production
+# ✅ Production build
 /build
 
-# misc
+# ✅ System files
 .DS_Store
+
+# 🔐 ENV files (keep some ignored, allow root .env)
+.env              # ✅ Include this line to track `.env`
+!.env             # ✅ UN-ignore `.env` in root
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
+# ✅ Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
