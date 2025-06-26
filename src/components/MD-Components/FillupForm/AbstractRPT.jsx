@@ -195,19 +195,19 @@ function AbstractRPT({ data, onSave }) {
     const newErrors = {};
 
     // Convert falsy but valid values (like "0") to a valid check
-    if (formData.currentPenalties === "" || formData.currentPenalties === null) 
+    if (formData.currentPenalties === "" || formData.currentPenalties === null)
         newErrors.currentPenalties = "Penalties are required";
 
-    if (formData.prevYear === "" || formData.prevYear === null) 
+    if (formData.prevYear === "" || formData.prevYear === null)
         newErrors.prevYear = "Immediate Preceding Year is required";
 
-    if (formData.prevPenalties === "" || formData.prevPenalties === null) 
+    if (formData.prevPenalties === "" || formData.prevPenalties === null)
         newErrors.prevPenalties = "Penalties are required";
 
-    if (formData.priorYears === "" || formData.priorYears === null) 
+    if (formData.priorYears === "" || formData.priorYears === null)
         newErrors.priorYears = "Prior Years is required";
 
-    if (formData.priorPenalties === "" || formData.priorPenalties === null) 
+    if (formData.priorPenalties === "" || formData.priorPenalties === null)
         newErrors.priorPenalties = "Penalties are required";
 
     // Log formData to debug what's being checked
@@ -288,14 +288,14 @@ const handleReset = () => {
       if (formData.id) {
         // Update endpoint (define this in Laravel if needed)
         response = await axiosInstance.put(
-          `/updaterptdata/${formData.id}`,
+          `updaterptdata/${formData.id}`,
           newEntry
         );
         console.log("Update response:", response.data);
         alert("Data updated successfully");
       } else {
         // Laravel POST: /api/saverptdata
-        response = await axiosInstance.post(`/saverptdata`, newEntry);
+        response = await axiosInstance.post(`saverptdata`, newEntry);
         console.log("Insert response:", response.data);
         alert("Data inserted successfully");
       }
@@ -907,6 +907,10 @@ const handleFormDataChange = (event) => {
     </Root>
   );
 }
+
+LinearProgressWithLabel.propTypes = {
+  value: PropTypes.number.isRequired,
+};
 
 AbstractRPT.propTypes = {
   data: PropTypes.object,

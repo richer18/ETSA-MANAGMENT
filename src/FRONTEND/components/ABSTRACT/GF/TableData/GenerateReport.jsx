@@ -36,9 +36,9 @@ import {
 import IconButton from "@mui/material/IconButton";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
+import axiosInstance from "../../../../../api/axiosInstance";
 
 function GenerateReport({ open, onClose }) {
   const [status, setStatus] = useState("idle");
@@ -153,14 +153,13 @@ function GenerateReport({ open, onClose }) {
     e.preventDefault();
     setStatus("loading");
 
-    // Convert monthYear format
     let payloadDateFrom = dateFrom;
     let payloadDateTo = dateTo;
 
     if (dateType === "monthYear") {
       const [year, month] = dateFrom.split("-");
       payloadDateFrom = `${year}-${month}`;
-      payloadDateTo = year; // Only year needed for backend conversion
+      payloadDateTo = year;
     }
 
     const payload = {
@@ -169,27 +168,14 @@ function GenerateReport({ open, onClose }) {
       dateTo: payloadDateTo,
       reportType,
       cashier,
-      orFrom: orFrom || null, // <-- NEW
-      orTo: orTo || null, // <-- NEW
+      orFrom: orFrom || null,
+      orTo: orTo || null,
     };
 
     try {
-      const response = await fetch(
-        "http://192.168.101.108:3001/api/generate-report",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await axiosInstance.post("generate-report", payload);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
+      const result = response.data;
       console.log("API Response:", result);
 
       if (result.data && result.data.length > 0) {

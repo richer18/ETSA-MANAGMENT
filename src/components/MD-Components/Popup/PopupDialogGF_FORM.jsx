@@ -1,9 +1,8 @@
+import { Button } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import PropTypes from "prop-types";
-import React from "react";
-import { Button } from "@mui/material";
 
 function PopupDialog({ onClose, children }) {
   return (
@@ -12,14 +11,6 @@ function PopupDialog({ onClose, children }) {
       onClose={onClose}
       maxWidth="md" // Adjust dialog width
       fullWidth // Make it take full width
-      PaperProps={{
-        sx: {
-          backgroundColor: "#f5f5f5", // Light gray background
-          color: "#333", // Dark text color
-          borderRadius: "12px", // Rounded corners
-          boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.2)", // Soft shadow effect
-        },
-      }}
     >
       <DialogTitle
         sx={{
@@ -40,7 +31,6 @@ function PopupDialog({ onClose, children }) {
       </DialogTitle>
 
       <DialogContent sx={{ padding: "20px 24px" }}>{children}</DialogContent>
-      
     </Dialog>
   );
 }

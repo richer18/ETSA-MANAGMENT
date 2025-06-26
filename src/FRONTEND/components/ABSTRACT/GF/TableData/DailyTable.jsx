@@ -368,17 +368,11 @@ function DailyTable({ onDataFiltered, onBack }) {
 
       {/* View Dialog */}
       
-      <Dialog 
-      open={viewOpen} 
-      onClose={handleViewClose} 
-      fullWidth 
+      <Dialog
+      open={viewOpen}
+      onClose={handleViewClose}
+      fullWidth
       maxWidth="xl"
-      PaperProps={{
-        sx: {
-          borderRadius: 4,
-          overflow: 'hidden'
-        }
-      }}
     >
       <DialogTitle
   sx={{

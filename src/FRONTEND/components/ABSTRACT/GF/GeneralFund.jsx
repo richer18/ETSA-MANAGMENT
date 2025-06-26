@@ -482,14 +482,9 @@ function GeneralFund() {
 
   const handleEditClick = () => {
     if (!selectedRow) return;
-    setDialogContent(
-      <AbstractGF
-        // Pass the data from the selected row
-        data={selectedRow}
-        // If you want a custom prop to indicate "edit mode", you can do:
-        mode="edit"
-      />
-    );
+
+    setDialogContent(<AbstractGF data={selectedRow} mode="edit" />);
+
     setIsDialogOpen(true);
     handleMenuClose();
   };
@@ -520,6 +515,7 @@ function GeneralFund() {
       setSelectedId(null);
     }
   };
+  
 
   return (
     <Box
@@ -625,7 +621,9 @@ function GeneralFund() {
                   transition: "all 0.2s ease",
                   boxShadow: "0 2px 6px rgba(25, 118, 210, 0.2)",
                 }}
-                onClick={handleClickOpen}
+                onClick={() =>
+                  handleClickOpen(<AbstractGF onClose={handleClose} />)
+                }
               >
                 New Entry
               </Button>
