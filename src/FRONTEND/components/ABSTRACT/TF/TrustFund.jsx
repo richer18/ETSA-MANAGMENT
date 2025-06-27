@@ -46,8 +46,8 @@ import TrustFundDialogPopupLDF from "../../../../components/MD-Components/Popup/
 import TrustFundDialogPopupTOTAL from "../../../../components/MD-Components/Popup/components/TrustFundPopup/TrustFundDialogPopupTOTAL";
 import TrustFundDialogPopupZF from "../../../../components/MD-Components/Popup/components/TrustFundPopup/TrustFundDialogPopupZF";
 
-import DailyTable from "./TableData/DailyTable";
 
+import DailyTable from "./TableData/DailyTable";
 import GenerateReport from './TableData/GenerateReport';
 
 
@@ -120,7 +120,7 @@ const years = [
   { label: "2029", value: "2029" },
 ];
 
-const BASE_URL = "http://192.168.101.108:3001"; // Define base URL
+const BASE_URL = "http://192.168.101.109:3001"; // Define base URL
 
 function TrustFund() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);

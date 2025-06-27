@@ -1,12 +1,11 @@
 import CloseIcon from '@mui/icons-material/Close';
+import { Button } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Tooltip from '@mui/material/Tooltip';
 import PropTypes from 'prop-types';
-import React from 'react';
-import TrustFundReport from '../../../../../template/layout/abstract/TrustFund/TableData/components/Table/DivingFee.jsx';
-import {Button} from '@mui/material';
+import TrustFundReport from "../../../../../FRONTEND/components/ABSTRACT/TF/TableData/components/Table/DivingFee";
 
 
 function TrustFundDialogPopupDF({ open, onClose }) {

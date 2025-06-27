@@ -5,9 +5,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Tooltip from '@mui/material/Tooltip';
 import PropTypes from 'prop-types';
-import React from 'react';
-import TrustFundAllTable from '../../../template/layout/abstract/TrustFund/TableData/TrustFunAllTable';
-
+import TrustFundAllTable from "../../../FRONTEND/components/ABSTRACT/TF/TableData/TrustFunAllTable";
 function TrustFundDialog({ open, onClose, data }) {
     return (
         <Dialog

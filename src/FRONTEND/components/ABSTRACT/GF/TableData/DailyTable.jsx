@@ -29,6 +29,9 @@ import { useEffect, useMemo, useState } from 'react';
 import axios from "../../../../../api/axiosInstance";
 import CommentsDialog from '../../RPT/TableData/CommentsDialog';
 import DailyTablev2 from './components/Table/DailyTable';
+
+
+
 // Styled components for the table cells
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,

@@ -1,6 +1,6 @@
-import { Autocomplete, Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import { Autocomplete, Box, Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
+import { useEffect, useState } from 'react';
+import axiosInstance from "../../../../../../../api/axiosInstance";
 
 const months = [
     { label: 'January', value: '1' },
@@ -27,7 +27,7 @@ const years = Array.from({ length: 100 }, (_, i) => ({
     value: 2030 - i,
 }));
 
-const BASE_URL = "http://192.168.101.108:3001";
+
 
 function TotalReport({ item, ...rest }) {
     const [month, setMonth] = useState(null);
@@ -41,22 +41,28 @@ function TotalReport({ item, ...rest }) {
     const handleYearChange = (event, newValue) => setYear(newValue);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get(`${BASE_URL}/api/general-fund-total-tax-report`, {
-                    params: {
-                        month: month ? month.value : undefined,
-                        day: day ? day.value : undefined,
-                        year: year ? year.value : undefined,
-                    },
-                });
-                setTaxData(response.data);
-            } catch (error) {
-                console.error('Error fetching tax data:', error.response ? error.response.data : error.message);
+      const fetchData = async () => {
+        try {
+          const response = await axiosInstance.get(
+            "general-fund-total-tax-report",
+            {
+              params: {
+                month: month?.value,
+                day: day?.value,
+                year: year?.value,
+              },
             }
-        };
+          );
+          setTaxData(response.data);
+        } catch (error) {
+          console.error(
+            "Error fetching tax data:",
+            error.response?.data || error.message
+          );
+        }
+      };
 
-        fetchData();
+      fetchData();
     }, [month, day, year]);
 
     useEffect(() => {
@@ -92,92 +98,119 @@ function TotalReport({ item, ...rest }) {
     };
 
     return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          py: 2,
+          width: "100%",
+        }}
+      >
         <Box
-            sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                py: 2,
-                width: '100%',
-            }}
-            {...rest}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
+          }}
         >
-            {/* Input Fields & Download Button */}
-            <Box 
-                sx={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    gap: 2,
-                    mb: 2
-                }}
-            >
-                <Autocomplete
-                    disablePortal
-                    id="month-selector"
-                    options={months}
-                    sx={{ width: 150 }}
-                    onChange={handleMonthChange}
-                    renderInput={(params) => <TextField {...params} label="Month" />}
-                    isOptionEqualToValue={(option, value) => option.value === value.value}
-                />
-                <Autocomplete
-                    disablePortal
-                    id="day-selector"
-                    options={availableDays}
-                    sx={{ width: 150 }}
-                    onChange={handleDayChange}
-                    renderInput={(params) => <TextField {...params} label="Day" />}
-                    value={day ? { label: String(day.value), value: day.value } : null}
-                    isOptionEqualToValue={(option, value) => option.value === value.value}
-                    disabled={!availableDays.length}
-                />
-                <Autocomplete
-                    disablePortal
-                    id="year-selector"
-                    options={years}
-                    sx={{ width: 150 }}
-                    onChange={handleYearChange}
-                    renderInput={(params) => <TextField {...params} label="Year" />}
-                    isOptionEqualToValue={(option, value) => option.value === value.value}
-                />
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleDownload}
-                    sx={{ height: '40px' }}
-                >
-                    Download
-                </Button>
-            </Box>
+          <Grid
+            container
+            spacing={2}
+            alignItems="center"
+            sx={{ marginBottom: 2 }}
+          >
+            <Grid item sx={{ ml: "auto" }}>
+              <Autocomplete
+                disablePortal
+                id="month-selector"
+                options={months}
+                sx={{ width: 150, mr: 2 }}
+                onChange={handleMonthChange}
+                renderInput={(params) => (
+                  <TextField {...params} label="Month" />
+                )}
+                isOptionEqualToValue={(option, value) =>
+                  option.value === value.value
+                }
+              />
+            </Grid>
 
-            {/* Tax Data Table */}
-            <TableContainer component={Paper} sx={{ maxWidth: 600 }}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Taxes</TableCell>
-                            <TableCell align="right">Total</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {taxData.length > 0 ? (
-                            taxData.map((row, index) => (
-                                <TableRow key={index}>
-                                    <TableCell>{row.Taxes}</TableCell>
-                                    <TableCell align="right"> {formatToPeso(row.Total)}</TableCell>
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={2} align="center">No data available</TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+            <Grid item sx={{ ml: "auto" }}>
+              <Autocomplete
+                disablePortal
+                id="day-selector"
+                options={availableDays}
+                sx={{ width: 150, mr: 2 }}
+                onChange={handleDayChange}
+                renderInput={(params) => <TextField {...params} label="Day" />}
+                value={
+                  day ? { label: String(day.value), value: day.value } : null
+                }
+                isOptionEqualToValue={(option, value) =>
+                  option.value === value.value
+                }
+                disabled={!availableDays.length}
+              />
+            </Grid>
+            <Grid item sx={{ ml: "auto" }}>
+              <Autocomplete
+                disablePortal
+                id="year-selector"
+                options={years}
+                sx={{ width: 150 }}
+                onChange={handleYearChange}
+                renderInput={(params) => <TextField {...params} label="Year" />}
+                isOptionEqualToValue={(option, value) =>
+                  option.value === value.value
+                }
+              />
+            </Grid>
+            <Grid item sx={{ ml: "auto" }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleDownload}
+                sx={{ height: "40px" }} // Ensure consistent height with TextField components
+              >
+                Download
+              </Button>
+            </Grid>
+          </Grid>
         </Box>
+
+        {/* Tax Data Table */}
+        <TableContainer component={Paper} sx={{ maxWidth: 600 }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Taxes</TableCell>
+                <TableCell align="right">Total</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {taxData.length > 0 ? (
+                taxData.map((row, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{row.Taxes}</TableCell>
+                    <TableCell align="right">
+                      {" "}
+                      {formatToPeso(row.Total)}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={2} align="center">
+                    No data available
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
     );
 }
 

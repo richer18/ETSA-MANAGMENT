@@ -25,8 +25,8 @@ import axios from 'axios';
 import { format, parseISO } from 'date-fns';
 import dayjs from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
-import CommentsDialog from '../../RealPropertyTax/TableData/CommentsDialog';
-import DailyTablev2 from './components/Table/DailyTable';
+import CommentsDialog from "../../RPT/TableData/CommentsDialog";
+import DailyTablev2 from "./components/Table/DailyTable";
 
 // Styled components
 const StyledTableCell = styled(TableCell)(({ theme }) => ({

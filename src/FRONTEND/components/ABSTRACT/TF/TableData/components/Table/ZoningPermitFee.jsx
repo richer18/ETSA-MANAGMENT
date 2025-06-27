@@ -1,6 +1,6 @@
-import { Autocomplete, Box, Button, Grid2, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
+import { Autocomplete, Box, Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const months = [
     { label: 'January', value: '1' },
@@ -125,8 +125,8 @@ const handleDownload = () => {
                 position: 'relative',
             }}
             >
-                <Grid2 container spacing={2} alignItems="center" sx={{ marginBottom: 2 }}>
-                <Grid2 item sx={{ ml: 'auto' }}>
+                <Grid container spacing={2} alignItems="center" sx={{ marginBottom: 2 }}>
+                <Grid item sx={{ ml: 'auto' }}>
                 <Autocomplete
                 disablePortal
                 id="month-selector"
@@ -136,9 +136,9 @@ const handleDownload = () => {
                 renderInput={(params) => <TextField {...params} label="Month" />}
                 isOptionEqualToValue={(option, value) => option.value === value.value}
                 />
-                </Grid2>
+                </Grid>
 
-                <Grid2 item sx={{ ml: 'auto' }}>
+                <Grid item sx={{ ml: 'auto' }}>
                 <Autocomplete
                 disablePortal
                 id="day-selector"
@@ -150,8 +150,8 @@ const handleDownload = () => {
                 isOptionEqualToValue={(option, value) => option.value === value.value}
                 disabled={!availableDays.length}
                 />
-                </Grid2>
-                <Grid2 item sx={{ ml: 'auto' }}>
+                </Grid>
+                <Grid item sx={{ ml: 'auto' }}>
                 <Autocomplete
                 disablePortal
                 id="year-selector"
@@ -161,8 +161,8 @@ const handleDownload = () => {
                 renderInput={(params) => <TextField {...params} label="Year" />}
                 isOptionEqualToValue={(option, value) => option.value === value.value}
                 />
-                </Grid2>
-                <Grid2 item sx={{ ml: 'auto' }}>
+                </Grid>
+                <Grid item sx={{ ml: 'auto' }}>
                 <Button 
                 variant="contained"
                 color="primary"
@@ -171,8 +171,8 @@ const handleDownload = () => {
                 >
                     Download
                 </Button>
-                </Grid2>
-                </Grid2>
+                </Grid>
+                </Grid>
                 </Box>
                 
                 

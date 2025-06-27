@@ -2,6 +2,15 @@ import { Autocomplete, Box, Button, Grid, Paper, Table, TableBody, TableCell, Ta
 import { useEffect, useState } from 'react';
 import axiosInstance from "../../../../../../../api/axiosInstance";
 
+const formatToPeso = (value) => {
+  return new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(parseFloat(value || 0));
+};
+
 const months = [
     { label: 'January', value: '1' },
     { label: 'February', value: '2' },
@@ -190,7 +199,7 @@ const handleDownload = () => {
                                         taxData.map((row, index) => (
                                         <TableRow key={index}>
                                             <TableCell>{row.Taxes}</TableCell>
-                                            <TableCell align="right">{row.Total}</TableCell>
+                                            <TableCell align="right"> {formatToPeso(row.Total)}</TableCell>
                                             </TableRow>
                                             ))
                                         ) : (

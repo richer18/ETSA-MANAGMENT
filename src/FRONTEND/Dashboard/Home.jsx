@@ -321,9 +321,9 @@ function DashboardLayoutBranding(props) {
       <AppProvider
         navigation={NAVIGATION}
         branding={{
-          logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
+          logo: <img src="/assets/images/ZAMBO_LOGO_P.png" alt="LGU logo" />,
           title: "ETMS",
-          homeUrl: "/toolpad/core/introduction",
+          // homeUrl: "/toolpad/core/introduction",
         }}
         router={router}
         theme={demoTheme}

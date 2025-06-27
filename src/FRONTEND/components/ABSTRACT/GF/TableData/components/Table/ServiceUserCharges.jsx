@@ -1,6 +1,15 @@
 import { Autocomplete, Box, Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
-import axios from 'axios';
 import { useEffect, useState } from 'react';
+import axiosInstance from "../../../../../../../api/axiosInstance";
+
+const formatToPeso = (value) => {
+  return new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(parseFloat(value || 0));
+};
 
 
 const months = [
@@ -28,7 +37,7 @@ const years = Array.from({ length: 100 }, (_, i) => ({
     value: 2030 - i,
 }));
 
-const BASE_URL = "http://192.168.101.108:3001";
+
 
 function ServiceUserCharges() {
    const [month, setMonth] = useState(null);
@@ -42,23 +51,30 @@ function ServiceUserCharges() {
     const handleYearChange = (event, newValue) => setYear(newValue);
     
     useEffect(() => {
-    const fetchData = async () => {
+      const fetchData = async () => {
         try {
-            const response = await axios.get(`${BASE_URL}/api/general-fund-service-user-charges`, {
-                params: {
-                    month: month ? month.value : undefined,
-                    day: day ? day.value : undefined,
-                    year: year ? year.value : undefined,
-                },
-            });
-        setTaxData(response.data);
-    } catch (error) {
-        console.error('Error fetching tax data:', error.response ? error.response.data : error.message);
-    }
-    };
+          const response = await axiosInstance.get(
+            "general-fund-service-user-charges",
+            {
+              params: {
+                month: month?.value,
+                day: day?.value,
+                year: year?.value,
+              },
+            }
+          );
 
-    fetchData();
-}, [month, day, year]);
+          setTaxData(response.data); // ✅ Save response to state
+        } catch (error) {
+          console.error(
+            "Error fetching tax data:",
+            error.response?.data || error.message
+          );
+        }
+      };
+
+      fetchData();
+    }, [month, day, year]);
 
 useEffect(() => {
     if (month && year) {
@@ -183,7 +199,7 @@ const handleDownload = () => {
                                         taxData.map((row, index) => (
                                         <TableRow key={index}>
                                             <TableCell>{row.Taxes}</TableCell>
-                                            <TableCell align="right">{row.Total}</TableCell>
+                                            <TableCell align="right"> {formatToPeso(row.Total)}</TableCell>
                                             </TableRow>
                                             ))
                                         ) : (
