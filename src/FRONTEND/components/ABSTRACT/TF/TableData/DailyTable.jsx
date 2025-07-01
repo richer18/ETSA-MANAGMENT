@@ -1,6 +1,5 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CloseIcon from '@mui/icons-material/Close';
-// import InboxIcon from '@mui/icons-material/Inbox';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
   Autocomplete,
@@ -21,10 +20,10 @@ import {
   Typography,
 } from '@mui/material';
 import { styled } from '@mui/system';
-import axios from 'axios';
 import { format, parseISO } from 'date-fns';
 import dayjs from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
+import axiosInstance from "../../../../../api/axiosInstance";
 import CommentsDialog from "../../RPT/TableData/CommentsDialog";
 import DailyTablev2 from "./components/Table/DailyTable";
 
@@ -90,14 +89,14 @@ const formatDate = (dateInput) => {
   };
 
 
-const BASE_URL = "http://192.168.101.108:3001"; // Define base URL
+
 
 function DailyTable({ onDataFiltered,onBack }) {
   
   const [data, setData] = useState([]);
   const currentYear = new Date().getFullYear();
-  const [selectedMonth, setSelectedMonth] = useState(1);
-  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
   const [viewData, setViewData] = useState([]);
   const [viewOpen, setViewOpen] = useState(false);
@@ -108,16 +107,17 @@ function DailyTable({ onDataFiltered,onBack }) {
 
   
 
-  // Fetch data on month/year change
+
   // Fetch data when the component mounts & when filters change
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/api/allDataTrustFund`, {
-          params: { month: selectedMonth, year: selectedYear }
+        const response = await axiosInstance.get("allDataTrustFund", {
+          params: { month: selectedMonth, year: selectedYear },
         });
 
         setData(response.data);
+
         if (onDataFiltered) {
           onDataFiltered(response.data);
         }
@@ -135,39 +135,46 @@ function DailyTable({ onDataFiltered,onBack }) {
       console.error("Current row or date is not defined.");
       return;
     }
-  
+
     const formattedDate = dayjs(currentRow.DATE).format("YYYY-MM-DD");
-  
-    axios
-      .get(`${BASE_URL}/api/viewalldataTrustFundTableView`, {
-        params: { date: formattedDate }, // ✅ Cleaner way to add query parameters
+
+    axiosInstance
+      .get("viewalldataTrustFundTableView", {
+        params: { date: formattedDate },
       })
       .then((response) => {
-  
-        // Transform numeric fields to strings
+        const numericFields = [
+          "BUILDING_PERMIT_FEE",
+          "LOCAL_80_PERCENT",
+          "TRUST_FUND_15_PERCENT",
+          "NATIONAL_5_PERCENT",
+          "ELECTRICAL_FEE",
+          "ZONING_FEE",
+          "LIVESTOCK_DEV_FUND",
+          "LOCAL_80_PERCENT_LIVESTOCK",
+          "NATIONAL_20_PERCENT",
+          "DIVING_FEE",
+          "LOCAL_40_PERCENT_DIVE_FEE",
+          "BRGY_30_PERCENT",
+          "FISHERS_30_PERCENT",
+          "TOTAL",
+        ];
+
         const transformedData = response.data.map((item) => {
-          const numericFields = [
-            "BUILDING_PERMIT_FEE", "LOCAL_80_PERCENT", "TRUST_FUND_15_PERCENT",
-            "NATIONAL_5_PERCENT", "ELECTRICAL_FEE", "ZONING_FEE",
-            "LIVESTOCK_DEV_FUND", "LOCAL_80_PERCENT_LIVESTOCK", "NATIONAL_20_PERCENT",
-            "DIVING_FEE", "LOCAL_40_PERCENT_DIVE_FEE", "BRGY_30_PERCENT",
-            "FISHERS_30_PERCENT", "TOTAL"
-          ];
-  
           return numericFields.reduce(
             (acc, field) => ({
               ...acc,
-              [field]: item[field]?.toString() || "0", // Ensure it's a string, fallback to "0"
+              [field]: item[field]?.toString() || "0",
             }),
             { ...item }
           );
         });
-  
+
         setViewData(transformedData);
         setViewOpen(true);
       })
       .catch((error) => {
-        console.error("Error fetching detailed data:", error);
+        console.error("Error fetching detailed view data:", error);
       });
   };
 
@@ -193,40 +200,41 @@ const handleClick = (event, row) => {
 };
 
 const handleViewComments = async (date) => {
+  try {
+    const response = await axiosInstance.get(`getTFComments/${date}`);
+
+    if (response.status === 200 && response.data.length > 0) {
+      setComments(response.data);
+      setOpenCommentDialog(true);
+    } else {
+      console.warn("No comments found for this date.");
+      setComments([]);
+    }
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+  }
+};
+
+useEffect(() => {
+  const fetchCommentCounts = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/getTFComments/${date}`);
-      console.log("Fetched Comments from API:", response.data); // Debugging
-  
-      if (response.status === 200 && response.data.length > 0) {
-        setComments(response.data); // Set comments
-        setOpenCommentDialog(true);
-      } else {
-        console.warn("No comments found for this date.");
-        setComments([]); // Clear comments
-        // setOpenCommentDialog(true);
-      }
+      const response = await axiosInstance.get("commentTFCounts");
+      setCommentCounts(response.data);
     } catch (error) {
-      console.error("Error fetching comments:", error);
+      console.error("Error fetching comment counts:", error);
     }
   };
 
-  useEffect(() => {
-    axios.get(`${BASE_URL}/api/commentTFCounts`)
-      .then((response) => {
-        setCommentCounts(response.data); // Store comment counts in state
-      })
-      .catch((error) => {
-        console.error("Error fetching comment counts:", error);
-      });
-  }, []);
+  fetchCommentCounts();
+}, []);
 
   const handleClose = () => {
     setAnchorEl(null);
   };
 
   const totalAmount = useMemo(() => {
-      return data.reduce((total, row) => total + row['Overall Total'], 0);
-    }, [data]);
+    return data.reduce((total, row) => total + Number(row.TOTAL || 0), 0);
+  }, [data]);
 
     const handleCommentDialogClose = () => {
       setOpenCommentDialog(false);
@@ -303,8 +311,8 @@ const handleViewComments = async (date) => {
     <TableHead>
       <StyledTableRow>
         {[
-          'DATE', 'Building', 'Electrical Fee', 
-          'Zoning Fee', 'Livestock Dev. Fund', 
+          'DATE', 'Building', 'Electrical Fee',
+          'Zoning Fee', 'Livestock Dev. Fund',
           'Diving Fee', 'TOTAL', 'COMMENTS', 'ACTION'
         ].map((header, index) => (
           <StyledTableCell key={index}>{header}</StyledTableCell>

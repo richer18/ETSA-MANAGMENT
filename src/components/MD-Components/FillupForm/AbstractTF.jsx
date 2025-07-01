@@ -1,44 +1,21 @@
-import DeleteIcon from '@mui/icons-material/Delete';
+
+
+import "bootstrap/dist/css/bootstrap.min.css";
+import React, { useCallback, useEffect, useState } from 'react';
+import { FaTrash } from "react-icons/fa";
+
 import {
   Alert,
-  Box,
   Button,
-  DialogActions,
-  Grid,
-  IconButton,
-  InputAdornment,
-  Select,
-  TextField,
-  Typography,
-} from "@mui/material";
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import { styled } from '@mui/system';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import dayjs from 'dayjs';
-import React, { useCallback, useEffect, useState } from 'react';
-import LinearProgressWithLabel from "../../../FRONTEND/components/ABSTRACT/GF/TableData/LinearProgressWithLabel";
+  Col,
+  Container,
+  Form,
+  InputGroup,
+  ProgressBar,
+  Row,
+} from "react-bootstrap";
 
 
-const Root = styled(Box)({
-  padding: '30px',
-  borderRadius: '8px',
-});
-  
-  const GridContainer = styled(Grid)({
-    spacing: 2,
-    justifyContent: 'center',
-  });
-
-  const InputField = styled(TextField)(({ theme }) => ({
-    margin: theme.spacing(1),
-    '& .MuiInputBase-root': {
-      borderRadius: theme.shape.borderRadius,
-    },
-  }));
 
 
 
@@ -105,11 +82,10 @@ function AbstractTF({ data, mode,refreshData  }) {
   const [receiptNumber, setReceiptNumber] = useState('');
   const [typeReceipt, setTypeReceipt] = useState('');
   const [alertMessage, setAlertMessage] = useState('');
-  const [alertSeverity, setAlertSeverity] = useState('info');
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [total, setTotal] = useState(0);
-
+  const [alertVariant, setAlertVariant] = useState("info");
 
 
 
@@ -122,14 +98,13 @@ function AbstractTF({ data, mode,refreshData  }) {
       
 // Total Calculation Hook
  // Calculate Total
-  useEffect(() => {
-    const total = Object.values(fieldValues).reduce((acc, cur) => acc + (Number(cur) || 0), 0);
-    setTotal(total.toFixed(2));
-  }, [fieldValues]);
-
-const handleChange = (event) => {
-    setSelectedCashier(event.target.value);
-  };
+ useEffect(() => {
+   const totalSum = Object.values(fieldValues).reduce(
+     (acc, value) => acc + parseFloat(value || 0),
+     0
+   );
+   setTotal(totalSum);
+ }, [fieldValues]);
 
   const handleFieldSelect = (event) => {
     const selectedField = event.target.value;
@@ -139,10 +114,6 @@ const handleChange = (event) => {
       setSelectedField('');
       setShowSelect(false);
     }
-  };
-
-  const handleNewField = () => {
-    setShowSelect(true);
   };
 
   const handleClearFields = React.useCallback(() => {
@@ -158,7 +129,7 @@ const handleChange = (event) => {
   const handleSave = useCallback(async () => {
     if (!selectedDate || !taxpayerName || !receiptNumber || !typeReceipt || !selectedCashier) {
       setAlertMessage('Please fill out all required fields.');
-      setAlertSeverity('error');
+      setAlertVariant("error");
       return;
     }
 
@@ -191,7 +162,7 @@ const handleChange = (event) => {
       }
 
       setAlertMessage(mode === 'edit' ? 'Data updated successfully.' : 'Data saved successfully.');
-      setAlertSeverity('success');
+      setAlertVariant("success");
 
       handleClearFields();
 
@@ -201,7 +172,7 @@ const handleChange = (event) => {
       }, 1000); // Adjust delay if needed
     } catch (error) {
       setAlertMessage(error.message);
-      setAlertSeverity('error');
+      setAlertVariant("error");
     } finally {
       setLoading(false);
     }
@@ -276,170 +247,169 @@ React.useEffect(() => {
     
     const filteredOptions = filterOptions(fieldOptions);
   return (
-    <Root>
-      <GridContainer container spacing={2}>
-        <Grid item xs={12}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-            fullWidth
-            value={selectedDate ? dayjs(selectedDate) : null}
-            onChange={(newValue) => setSelectedDate(newValue ? newValue.format('YYYY-MM-DD') : null)}
-            slotProps={{ field: { clearable: true } }}
-            required
-            />
-            </LocalizationProvider>
-            </Grid>
-                <Grid item xs={12}>
-                <TextField
-            id="filled-receipt"
-            label="RECEIPT NO. P.F. NO. 25(A)"
-            value={receiptNumber}
-            onChange={(e) => setReceiptNumber(e.target.value)}
-            variant="standard"
-            fullWidth
-            required
-          />
-        </Grid>
-                <Grid item xs={12}>
-                    <InputField
-                        id="filled-taxpayer-name"
-                        label="NAME OF TAXPAYER"
-                        value={taxpayerName}
-                        variant="standard"
-                        onChange={(e) => setTaxpayerName(e.target.value)}
-                        fullWidth
-                        required
-                    />
-                </Grid>
-                <Grid item xs={12}>
-          <TextField
-            id="type-receipt"
-            label="Type of Receipt"
-            variant="standard"
-            value={typeReceipt}
-            onChange={(e) => setTypeReceipt(e.target.value)}
-            fullWidth
-            required
-          />
-        </Grid>
-
-                <Grid item xs={12}>
-          <FormControl fullWidth variant="outlined">
-            <InputLabel id="cashier-select-label">Select Cashier</InputLabel>
-            <Select
-              labelId="cashier-select-label"
-              id="cashier-select"
-              value={selectedCashier}
-              onChange={handleChange}
-              label="Select Cashier"
-              required
-            >
-              {cashier.map((name) => (
-                <MenuItem key={name} value={name}>
-                  {name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-       {fields.map((field) => {
-  const config = fieldConfigs[field];
-
-  if (!config) return null; // Skip fields not in the config
-
-  const value = fieldValues[field] || '';
-
-  return (
-    <Grid item xs={12} key={field}>
-      <InputField
-        id={field}
-        label={config.label}
-        variant="standard"
-        fullWidth
-        required
-        value={value}
-        onChange={(e) => handleFieldChange(field, e.target.value)}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton onClick={() => handleRemoveField(field)}>
-                <DeleteIcon />
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
-      {config.percentages.length > 0 && (
-  <Grid container spacing={1} sx={{ mt: 2 }}>
-    {config.percentages.map((percentage, index) => (
-      <Grid item xs={12} key={index}>
-        <Typography variant="body2" color="textSecondary">
-          <strong>{percentage.label}</strong>: {percentage.value(value)}
-        </Typography>
-      </Grid>
-    ))}
-  </Grid>
-)}
-    </Grid>
-  );
-})}
-        {showSelect && (
-          <Grid item xs={12}>
-            <FormControl variant="standard" fullWidth>
-              <InputLabel id="select-field-label">Select Field</InputLabel>
-              <Select
-                labelId="select-field-label"
-                value={selectedField}
-                onChange={handleFieldSelect}
-                label="Select Field"
+    <Container>
+      <h4 className="mb-4 text-center">
+        Trust Fund Abstracts ({mode === "edit" ? "Edit" : "Add"})
+      </h4>
+      <Form onSubmit={handleSave}>
+        <Row className="g-3 mb-4">
+          <Col md={12}>
+            <Form.Group controlId="formDate">
+              <Form.Label>Date</Form.Label>
+              <Form.Control
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
                 required
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      maxHeight: 300,
-                    },
-                  },
-                }}
+              />
+            </Form.Group>
+          </Col>
+
+          <Col md={12}>
+            <Form.Group controlId="formTaxpayer">
+              <Form.Label>NAME OF TAXPAYER</Form.Label>
+              <Form.Control
+                type="text"
+                value={taxpayerName}
+                onChange={(e) => setTaxpayerName(e.target.value)}
+                required
+              />
+            </Form.Group>
+          </Col>
+
+          <Col md={12}>
+            <Form.Group controlId="formReceipt">
+              <Form.Label>RECEIPT NO. P.F. NO. 25(A)</Form.Label>
+              <Form.Control
+                type="text"
+                value={receiptNumber}
+                onChange={(e) => setReceiptNumber(e.target.value)}
+                required
+              />
+            </Form.Group>
+          </Col>
+
+          <Col md={12}>
+            <Form.Group controlId="formReceiptType">
+              <Form.Label>Type of Receipt</Form.Label>
+              <Form.Control
+                type="text"
+                value={typeReceipt}
+                onChange={(e) => setTypeReceipt(e.target.value)}
+                required
+              />
+            </Form.Group>
+          </Col>
+
+          <Col md={12}>
+            <Form.Group controlId="formCashier">
+              <Form.Label>Select Cashier</Form.Label>
+              <Form.Select
+                value={selectedCashier}
+                onChange={(e) => setSelectedCashier(e.target.value)}
+                required
               >
-                {filteredOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
+                {cashier.map((name) => (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
                 ))}
-              </Select>
-            </FormControl>
-          </Grid>
+              </Form.Select>
+            </Form.Group>
+          </Col>
+
+          {/* Enhanced Dynamic Fields With Breakdown */}
+          {fields.map((field) => {
+            const config = fieldConfigs[field];
+            if (!config) return null;
+
+            const rawValue = fieldValues[field];
+            const numericValue = parseFloat(rawValue);
+
+            // Only show fields with value > 0
+            if (!numericValue || numericValue <= 0) return null;
+
+            return (
+              <Col md={12} key={field}>
+                <Form.Group controlId={`form-${field}`}>
+                  <Form.Label>{config.label}</Form.Label>
+                  <InputGroup>
+                    <Form.Control
+                      type="number"
+                      value={rawValue}
+                      onChange={(e) => handleFieldChange(field, e.target.value)}
+                      required
+                    />
+                    <Button
+                      variant="outline-danger"
+                      onClick={() => handleRemoveField(field)}
+                    >
+                      <FaTrash />
+                    </Button>
+                  </InputGroup>
+
+                  {config.percentages.length > 0 && (
+                    <div className="mt-2 ms-2">
+                      {config.percentages.map((p, idx) => (
+                        <div
+                          key={idx}
+                          style={{ fontSize: "0.875rem", color: "#6c757d" }}
+                        >
+                          <strong>{p.label}:</strong> ₱{p.value(numericValue)}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </Form.Group>
+              </Col>
+            );
+          })}
+
+          <Col md={12}>
+            <Button
+              variant="primary"
+              onClick={() => setShowSelect(true)}
+              className="mt-2"
+            >
+              Add New Field
+            </Button>
+          </Col>
+
+          <Col md={12}>
+            <h5 className="mt-3">Total: ₱{total.toFixed(2)}</h5>
+          </Col>
+        </Row>
+
+        {alertMessage && (
+          <Alert variant={alertVariant} className="mt-3">
+            {alertMessage}
+          </Alert>
         )}
 
-        <Grid item xs={12}>
-          <Button onClick={handleNewField} variant="contained">
-            Add New Field
-          </Button>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="h9" color="secondary">Total: {total}</Typography>
-        </Grid>
-      </GridContainer>
-      <DialogActions>
-        <Button onClick={handleClearFields} color="secondary">
-          Reset
-        </Button>
-        <Button onClick={handleSave} color="secondary" variant="contained">
-          Save
-        </Button>
-      </DialogActions>
-      {loading && (
-          <Grid item xs={12}>
-            <Box sx={{ width: '100%' }}>
-              <LinearProgressWithLabel value={progress} />
-            </Box>
-          </Grid>
+        {loading && (
+          <ProgressBar
+            now={progress}
+            label={`${progress.toFixed(0)}%`}
+            animated
+            className="mt-3"
+          />
         )}
-      {alertMessage && (
-        <Alert severity={alertSeverity}>{alertMessage}</Alert>
-      )}
-      </Root>
-  )
+
+        <div className="d-flex justify-content-end mt-4">
+          <Button
+            variant="secondary"
+            onClick={handleClearFields}
+            className="me-2"
+          >
+            Reset
+          </Button>
+          <Button variant="primary" type="submit">
+            {mode === "edit" ? "Update" : "Save"}
+          </Button>
+        </div>
+      </Form>
+    </Container>
+  );
 }
 
 export default AbstractTF

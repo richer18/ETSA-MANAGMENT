@@ -26,13 +26,13 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import axios from "axios";
 import { saveAs } from "file-saver";
 import React, { useEffect, useState } from "react";
 import { BiSolidReport } from "react-icons/bi";
 import { IoMdAdd, IoMdDownload } from "react-icons/io";
 import { IoToday } from "react-icons/io5";
 import * as XLSX from "xlsx";
+import axiosInstance from "../../../../api/axiosInstance";
 
 import TrustFunds from "../../../../components/MD-Components/FillupForm/AbstractTF";
 import PopupDialog from "../../../../components/MD-Components/Popup/PopupDialogTF_FORM";
@@ -120,7 +120,6 @@ const years = [
   { label: "2029", value: "2029" },
 ];
 
-const BASE_URL = "http://192.168.101.109:3001"; // Define base URL
 
 function TrustFund() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -176,13 +175,8 @@ function TrustFund() {
     const fetchTotals = async () => {
       try {
         const fetchTotal = async (endpoint) => {
-          const response = await fetch(
-            `${BASE_URL}/api/${endpoint}`
-          );
-          if (!response.ok)
-            throw new Error(`Network response was not ok ${endpoint}`);
-          const data = await response.json();
-          return data;
+          const response = await axiosInstance.get(`${endpoint}`);
+          return response.data;
         };
 
         const [
@@ -211,13 +205,15 @@ function TrustFund() {
         );
         setDivingFee(parseFloat(divingFeeData.diving_fee_total || 0));
       } catch (error) {
-        console.error("Error fetching totals:", error);
+        console.error(
+          "Error fetching totals:",
+          error.response?.data || error.message
+        );
       }
     };
 
     fetchTotals();
   }, []);
-
 
    const [reportDialog, setReportDialog] = useState({
         open: false,
@@ -270,14 +266,17 @@ function TrustFund() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/api/table-trust-fund-all`);
+        const response = await axiosInstance.get("table-trust-fund-all");
         setData(response.data);
         setFilteredData(response.data); // Initialize with the full dataset
       } catch (error) {
-        console.error("Error fetching table-trust-fund-all data:", error.message);
+        console.error(
+          "Error fetching table-trust-fund-all data:",
+          error.message
+        );
       }
     };
-  
+
     fetchData();
   }, []);
 
@@ -340,15 +339,10 @@ function TrustFund() {
   useEffect(() => {
     const fetchAllData = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/api/trust-fund-total`);
-  
-        if (!response.ok) {
-          const errorMessage = await response.text();
-          throw new Error(`Network response was not ok: ${errorMessage}`);
-        }
-  
-        const data = await response.json();
-  
+        const response = await axiosInstance.get("/trust-fund-total");
+
+        const data = response.data;
+
         if (Array.isArray(data) && data.length > 0) {
           setAllTotal(parseFloat(data[0]?.overall_total) || 0);
         } else {
@@ -356,11 +350,14 @@ function TrustFund() {
           setAllTotal(0);
         }
       } catch (error) {
-        console.error("Error fetching trust-fund-total data:", error.message);
-        setAllTotal(0); // Ensure state is updated even in case of failure
+        console.error(
+          "Error fetching trust-fund-total data:",
+          error.response?.data || error.message
+        );
+        setAllTotal(0); // Fallback in case of error
       }
     };
-  
+
     fetchAllData();
   }, []);
 
@@ -559,14 +556,13 @@ function TrustFund() {
   };
 
   return (
-    <Box
-      sx={{
-        flexGrow: 1,
-        padding: 3,
-        backgroundColor: "#f5f5f5",
-        minHeight: "100vh",
-      }}
-    >
+   <Box
+         sx={{
+           flexGrow: 1,
+           padding: 3,
+           minHeight: "100vh",
+         }}
+       >
       <Box sx={{ mb: 4 }}>
         {/* Search & Filters Row */}
         <Box
