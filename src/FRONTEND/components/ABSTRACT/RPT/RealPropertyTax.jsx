@@ -50,7 +50,14 @@ import GenerateReport from "./TableData/GenerateReport";
 import ReportTable from "./TableData/ReportTable";
 import SummaryTable from "./TableData/Summary";
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({ whiteSpace: "nowrap", fontWeight: "bold", textAlign: "center", backgroundColor: theme.palette.primary.main, color: theme.palette.common.white,
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  whiteSpace: "nowrap",
+  fontWeight: "bold",
+  textAlign: "center",
+  background: "linear-gradient(135deg, #1976d2, #63a4ff)",
+  color: theme.palette.common.white,
+  borderBottom: `2px solid ${theme.palette.primary.dark}`,
+  fontSize: 14,
 }));
 
 const months = [
@@ -237,7 +244,16 @@ function Row({ row }) {
         <TableCell align="center">{row.prev_penalties}</TableCell>
         <TableCell align="center">{row.prior_years}</TableCell>
         <TableCell align="center">{row.prior_penalties}</TableCell>
-        <TableCell align="center">{row.total}</TableCell>
+        <TableCell align="center">
+          {" "}
+          <Typography variant="body2" fontWeight={600} color="success.main">
+            {new Intl.NumberFormat("en-PH", {
+              style: "currency",
+              currency: "PHP",
+              minimumFractionDigits: 2,
+            }).format(row.total)}
+          </Typography>
+        </TableCell>
         <TableCell align="center">
           <Button
             aria-controls="simple-menu"

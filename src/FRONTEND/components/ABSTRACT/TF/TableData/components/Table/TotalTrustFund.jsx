@@ -1,6 +1,6 @@
 import { Autocomplete, Box, Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import axiosInstance from "../../../../../../../api/axiosInstance";
 
 const months = [
     { label: 'January', value: '1' },
@@ -27,7 +27,7 @@ const years = Array.from({ length: 100 }, (_, i) => ({
     value: 2050 - i,
 }));
 
-const BASE_URL = "http://192.168.101.108:3001"; // Define base URL
+
 
 function TotalTrustFund() {
     const [month, setMonth] = useState(null);
@@ -42,27 +42,29 @@ function TotalTrustFund() {
 
 
     useEffect(() => {
-        const fetchData = async () => {
-          try {
-            const response = await axios.get(`${BASE_URL}/api/trust-fund-total-fees-reports`, {
+      const fetchData = async () => {
+        try {
+          const response = await axiosInstance.get(
+            "trust-fund-total-fees-reports",
+            {
               params: {
-                month: month?.value, // Safe optional chaining
+                month: month?.value,
                 day: day?.value,
                 year: year?.value,
               },
-            });
-      
-            setTaxData(response.data);
-          } catch (error) {
-            console.error(
-              "Error fetching tax data:",
-              error.response?.data || error.message
-            );
-          }
-        };
-      
-        fetchData();
-      }, [month, day, year]); // Runs when month, day, or year changes
+            }
+          );
+          setTaxData(response.data);
+        } catch (error) {
+          console.error(
+            "Error fetching tax data:",
+            error.response?.data || error.message
+          );
+        }
+      };
+
+      fetchData();
+    }, [month, day, year]);
 
   useEffect(() => {
     if (month && year) {

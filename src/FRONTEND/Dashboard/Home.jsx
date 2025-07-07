@@ -24,14 +24,19 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import Box from "@mui/material/Box";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
+import Grid from "@mui/material/Grid";
 import Link from "@mui/material/Link";
-import { createTheme } from "@mui/material/styles";
+import Paper from "@mui/material/Paper";
+import { createTheme, styled } from "@mui/material/styles";
 import { AppProvider } from "@toolpad/core/AppProvider";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import { DemoProvider } from "@toolpad/core/internal";
 import PropTypes from "prop-types";
 import * as React from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import './system.css';
+
+
 
 const NAVIGATION = [
   {
@@ -237,7 +242,10 @@ const demoTheme = createTheme({
 });
 
 function DemoPageContent({ pathname }) {
+
   const breadcrumbItems = pathname.split("/").filter(Boolean);
+
+  const isDashboard = pathname === "/my-app" || pathname === "/";
   return (
     <Box
       sx={{
@@ -282,7 +290,7 @@ function DemoPageContent({ pathname }) {
       </Box>
 
       <Box sx={{ textAlign: "center", flexGrow: 1 }}>
-        <Outlet />
+        {isDashboard ? <DashboardHome /> : <Outlet />}
       </Box>
     </Box>
   );
@@ -345,5 +353,78 @@ DashboardLayoutBranding.propTypes = {
    */
   window: PropTypes.func,
 };
+
+const Item = styled(Paper)(({ theme }) => ({
+  backgroundColor: "#fff",
+  ...theme.typography.body2,
+  padding: theme.spacing(1),
+  textAlign: "center",
+  color: (theme.vars ?? theme).palette.text.secondary,
+  ...theme.applyStyles("dark", {
+    backgroundColor: "#1A2027",
+  }),
+}));
+
+function DashboardHome (){
+
+return (
+  <div>
+    <header className="dashboard-header">
+      <div className="header-content">
+        <h1>Treasurer's Dashboard</h1>
+        <p>Municipal Treasurer Office • As of October 15, 2023</p>
+      </div>
+      <div className="header-actions">
+        <button className="filter-btn">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+          >
+            <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z" />
+          </svg>
+          Filter Period
+        </button>
+        <button className="export-btn">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+          >
+            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+          </svg>
+          Export Reports
+        </button>
+      </div>
+    </header>
+    
+
+    <Box sx={{ width: "100%" }}>
+      <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+        <Grid size={4}>
+          <Item>Total Tax Collected</Item>
+        </Grid>
+        <Grid size={4}>
+          <Item>Total this month</Item>
+        </Grid>
+        <Grid size={4}>
+          <Item>Total this day</Item>
+        </Grid>
+        <Grid size={4}>
+          <Item>Business</Item>
+        </Grid>
+        <Grid size={8}>
+          <Item>STATUS</Item>
+        </Grid>
+      </Grid>
+    </Box>
+  </div>
+);
+}
 
 export default DashboardLayoutBranding;

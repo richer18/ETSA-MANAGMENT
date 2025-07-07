@@ -1,9 +1,5 @@
-
-
 import "bootstrap/dist/css/bootstrap.min.css";
-import React, { useCallback, useEffect, useState } from 'react';
-import { FaTrash } from "react-icons/fa";
-
+import { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   Button,
@@ -14,122 +10,113 @@ import {
   ProgressBar,
   Row,
 } from "react-bootstrap";
-
-
-
-
-
-  const fieldOptions = ['BUILDING_PERMIT_FEE', 'ELECTRICAL_FEE', 'ZONING_FEE', 'LIVESTOCK_DEV_FUND', 'DIVING_FEE'];
-  const cashier = ['Please a select','FLORA MY','IRIS','RICARDO','AGNES'];
+import { FaTrash } from "react-icons/fa";
+import axiosInstance from "../../../api/axiosInstance";
+// Static Field Definitions
+const fieldOptions = [
+  "BUILDING_PERMIT_FEE",
+  "ELECTRICAL_FEE",
+  "ZONING_FEE",
+  "LIVESTOCK_DEV_FUND",
+  "DIVING_FEE",
+];
+const cashier = ["Please a select", "FLORA MY", "IRIS", "RICARDO", "AGNES"];
 
 const fieldConfigs = {
   BUILDING_PERMIT_FEE: {
-    label: 'Building Permit Fee',
+    label: "Building Permit Fee",
     percentages: [
-      { label: 'Local Fund (80%)', value: (value) => (value * 0.8).toFixed(2) },
-      { label: 'Trust Fund (15%)', value: (value) => (value * 0.15).toFixed(2) },
-      { label: 'National Fund (5%)', value: (value) => (value * 0.05).toFixed(2) },
+      { label: "Local Fund (80%)", value: (value) => (value * 0.8).toFixed(2) },
+      {
+        label: "Trust Fund (15%)",
+        value: (value) => (value * 0.15).toFixed(2),
+      },
+      {
+        label: "National Fund (5%)",
+        value: (value) => (value * 0.05).toFixed(2),
+      },
     ],
   },
   LIVESTOCK_DEV_FUND: {
-    label: 'Livestock Dev. Fund',
+    label: "Livestock Dev. Fund",
     percentages: [
-      { label: 'Local Fund (80%)', value: (value) => (value * 0.8).toFixed(2) },
-      { label: 'National Fund (20%)', value: (value) => (value * 0.2).toFixed(2) },
+      { label: "Local Fund (80%)", value: (value) => (value * 0.8).toFixed(2) },
+      {
+        label: "National Fund (20%)",
+        value: (value) => (value * 0.2).toFixed(2),
+      },
     ],
   },
   DIVING_FEE: {
-    label: 'Diving Fee',
+    label: "Diving Fee",
     percentages: [
-      { label: 'GF (40%)', value: (value) => (value * 0.4).toFixed(2) },
-      { label: 'BRGY (30%)', value: (value) => (value * 0.3).toFixed(2) },
-      { label: 'Fishers (30%)', value: (value) => (value * 0.3).toFixed(2) },
+      { label: "GF (40%)", value: (value) => (value * 0.4).toFixed(2) },
+      { label: "BRGY (30%)", value: (value) => (value * 0.3).toFixed(2) },
+      { label: "Fishers (30%)", value: (value) => (value * 0.3).toFixed(2) },
     ],
   },
   ELECTRICAL_FEE: {
-    label: 'Electrical Fee',
+    label: "Electrical Fee",
     percentages: [],
   },
   ZONING_FEE: {
-    label: 'Zoning Fee',
+    label: "Zoning Fee",
     percentages: [],
   },
 };
 
 
-  const filterOptions = (options, inputValue) => {
-  if (!inputValue) {
-    return options;
-  }
-
-  return options
-    .filter(option => option && typeof option === 'string')
-    .filter(option =>
-      option.toLowerCase().includes(inputValue.toLowerCase())
-    );
-};
-
-const BASE_URL = "http://192.168.101.109:3001"; // Define base URL
-
-function AbstractTF({ data, mode,refreshData  }) {
+function AbstractTF({ data, mode, refreshData }) {
   const [fields, setFields] = useState([]);
   const [fieldValues, setFieldValues] = useState({});
-  const [showSelect, setShowSelect] = useState(true);
-  const [selectedField, setSelectedField] = useState('');
+  const [showSelect, setShowSelect] = useState(false);
+  const [selectedField, setSelectedField] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedCashier, setSelectedCashier] = useState('');
-  const [taxpayerName, setTaxpayerName] = useState('');
-  const [receiptNumber, setReceiptNumber] = useState('');
-  const [typeReceipt, setTypeReceipt] = useState('');
-  const [alertMessage, setAlertMessage] = useState('');
+  const [selectedCashier, setSelectedCashier] = useState("");
+  const [taxpayerName, setTaxpayerName] = useState("");
+  const [receiptNumber, setReceiptNumber] = useState("");
+  const [typeReceipt, setTypeReceipt] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [total, setTotal] = useState(0);
-  const [alertVariant, setAlertVariant] = useState("info");
+  const [alertVariant, setAlertSeverity] = useState("info");
 
-
-
-   const handleFieldChange = (field, value) => {
+  const handleFieldChange = (field, value) => {
     setFieldValues((prevValues) => ({
       ...prevValues,
       [field]: value,
     }));
   };
-      
-// Total Calculation Hook
- // Calculate Total
- useEffect(() => {
-   const totalSum = Object.values(fieldValues).reduce(
-     (acc, value) => acc + parseFloat(value || 0),
-     0
-   );
-   setTotal(totalSum);
- }, [fieldValues]);
 
-  const handleFieldSelect = (event) => {
-    const selectedField = event.target.value;
-    if (selectedField) {
-      setFields([...fields, selectedField]);
-      setFieldValues({ ...fieldValues, [selectedField]: '' });
-      setSelectedField('');
-      setShowSelect(false);
-    }
-  };
+  useEffect(() => {
+    const totalSum = Object.values(fieldValues).reduce(
+      (acc, value) => acc + parseFloat(value || 0),
+      0
+    );
+    setTotal(totalSum);
+  }, [fieldValues]);
 
-  const handleClearFields = React.useCallback(() => {
+  const handleClearFields = useCallback(() => {
     setSelectedDate(null);
-    setTaxpayerName('');
-    setReceiptNumber('');
-    setTypeReceipt('');
-    setSelectedCashier('');
+    setTaxpayerName("");
+    setReceiptNumber("");
+    setTypeReceipt("");
+    setSelectedCashier("");
     setFieldValues({});
     setFields([]);
   }, []);
-  
+
   const handleSave = useCallback(async () => {
-    if (!selectedDate || !taxpayerName || !receiptNumber || !typeReceipt || !selectedCashier) {
-      setAlertMessage('Please fill out all required fields.');
-      setAlertVariant("error");
+    if (
+      !selectedDate ||
+      !taxpayerName ||
+      !receiptNumber ||
+      !typeReceipt ||
+      !selectedCashier
+    ) {
+      setAlertMessage("Please fill out all required fields.");
+      setAlertSeverity("error");
       return;
     }
 
@@ -146,61 +133,77 @@ function AbstractTF({ data, mode,refreshData  }) {
     setLoading(true);
 
     try {
-      const url = mode === 'edit'
-        ? `${BASE_URL}/api/update-trust-fund/${data.ID}`
-        : `${BASE_URL}/api/save-trust-fund`;
+      const url =
+        mode === "edit" ? `update-trust-fund/${data.ID}` : `save-trust-fund`;
 
-      const response = await fetch(url, {
-        method: mode === 'edit' ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+      const method = mode === "edit" ? "put" : "post";
+   
+      await axiosInstance({
+        method,
+        url,
+        data: payload,
       });
 
-      if (!response.ok) {
-        const errorMessage = response.status === 400 ? 'Receipt number already exists.' : 'Failed to save data.';
-        throw new Error(errorMessage);
-      }
-
-      setAlertMessage(mode === 'edit' ? 'Data updated successfully.' : 'Data saved successfully.');
-      setAlertVariant("success");
+      setAlertMessage(
+        mode === "edit"
+          ? "Data updated successfully."
+          : "Data saved successfully."
+      );
+      setAlertSeverity("success");
 
       handleClearFields();
 
-      // Refresh the page after a short delay to allow alert messages to be shown
       setTimeout(() => {
         window.location.reload();
-      }, 1000); // Adjust delay if needed
+      }, 1000);
     } catch (error) {
-      setAlertMessage(error.message);
-      setAlertVariant("error");
+      console.error("Axios error:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message,
+      });
+
+      const message =
+        error.response?.status === 400
+          ? "Receipt number already exists."
+          : error.response?.data?.message || "Failed to save data.";
+
+      setAlertMessage(message);
+      setAlertSeverity("error");
     } finally {
       setLoading(false);
     }
-  }, [selectedDate, taxpayerName, receiptNumber, typeReceipt, selectedCashier, total, fieldValues, mode, data, handleClearFields]);
+  }, [
+    selectedDate,
+    taxpayerName,
+    receiptNumber,
+    typeReceipt,
+    selectedCashier,
+    total,
+    fieldValues,
+    mode,
+    data,
+    handleClearFields,
+  ]);
+  
+  
 
+  useEffect(() => {
+    if (loading) {
+      setProgress(0); // optional: reset progress bar at start
+      const timer = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(timer);
+            return 100;
+          }
+          return Math.min(prev + Math.random() * 10, 100);
+        });
+      }, 300);
+      return () => clearInterval(timer);
+    }
+  }, [loading]);
 
-// Handle form submission and progress animation
-React.useEffect(() => {
-  if (loading) {
-    const timer = setInterval(() => {
-      setProgress((prevProgress) => {
-        if (prevProgress >= 100) {
-          clearInterval(timer); // Stop the timer when 100% is reached
-          handleSave(); // Trigger save operation when 100% is reached
-          return 100; // Ensure progress stays at 100%
-        }
-        const diff = Math.random() * 10;
-        return Math.min(prevProgress + diff, 100);
-      });
-    }, 300); // Adjust the interval time if needed
-
-    return () => {
-      clearInterval(timer);
-    };
-  }
-}, [loading, handleSave]); // Include handleSave in the dependency array
-
-  // Handle Remove Field
   const handleRemoveField = (fieldToRemove) => {
     const updatedFields = fields.filter((field) => field !== fieldToRemove);
     setFields(updatedFields);
@@ -212,53 +215,47 @@ React.useEffect(() => {
     });
   };
 
+  useEffect(() => {
+    if (mode === "edit" && data) {
+      setSelectedDate(data.DATE || null);
+      setTaxpayerName(data.NAME || "");
+      setReceiptNumber(data.RECEIPT_NO || "");
+      setTypeReceipt(data.TYPE_OF_RECEIPT || "");
+      setSelectedCashier(data.CASHIER || "");
 
-   // -----------------------------
-    //  PREFILL IF EDIT MODE
-    // -----------------------------
-    useEffect(() => {
-      if (mode === 'edit' && data) {
-        // The field names below must match the DB fields from your table
-        setSelectedDate(data.DATE || null);
-        setTaxpayerName(data.NAME || '');
-        setReceiptNumber(data.RECEIPT_NO || '');
-        setTypeReceipt(data.TYPE_OF_RECEIPT || '');
-        setSelectedCashier(data.CASHIER || '');
-  
-        // For dynamic fields, if your DB includes them, you can parse them here:
-        // e.g., if your row has 'Manufacturing', 'Retailing', etc. as numeric values
-        // We build an array & object from what's actually present on `data`
-        const newFields = [];
-        const newFieldValues = {};
-  
-        // Check each known fieldOption, if it’s > 0 or some value, treat it as present
-        fieldOptions.forEach((fieldKey) => {
-          if (data[fieldKey] !== undefined && data[fieldKey] !== 0) {
-            newFields.push(fieldKey);
-            newFieldValues[fieldKey] = data[fieldKey].toString(); // or data[fieldKey]
-          }
-        });
-  
-        setFields(newFields);
-        setFieldValues(newFieldValues);
-      }
-    }, [data, mode]);
-    
-    
-    const filteredOptions = filterOptions(fieldOptions);
+      const newFields = [];
+      const newFieldValues = {};
+
+      fieldOptions.forEach((fieldKey) => {
+        const fieldValue = Number(data[fieldKey]);
+        if (!isNaN(fieldValue) && fieldValue > 0) {
+          newFields.push(fieldKey);
+          newFieldValues[fieldKey] = fieldValue.toString();
+        }
+      });
+
+      setFields(newFields);
+      setFieldValues(newFieldValues);
+    }
+  }, [data, mode]);
+
   return (
     <Container>
       <h4 className="mb-4 text-center">
         Trust Fund Abstracts ({mode === "edit" ? "Edit" : "Add"})
       </h4>
-      <Form onSubmit={handleSave}>
+      <Form
+        onSubmit={(e) => {
+          e.preventDefault();
+        }}
+      >
         <Row className="g-3 mb-4">
           <Col md={12}>
             <Form.Group controlId="formDate">
               <Form.Label>Date</Form.Label>
               <Form.Control
                 type="date"
-                value={selectedDate}
+                value={selectedDate || ""}
                 onChange={(e) => setSelectedDate(e.target.value)}
                 required
               />
@@ -267,7 +264,7 @@ React.useEffect(() => {
 
           <Col md={12}>
             <Form.Group controlId="formTaxpayer">
-              <Form.Label>NAME OF TAXPAYER</Form.Label>
+              <Form.Label>Name of Taxpayer</Form.Label>
               <Form.Control
                 type="text"
                 value={taxpayerName}
@@ -279,7 +276,7 @@ React.useEffect(() => {
 
           <Col md={12}>
             <Form.Group controlId="formReceipt">
-              <Form.Label>RECEIPT NO. P.F. NO. 25(A)</Form.Label>
+              <Form.Label>Receipt No. P.F. No. 25(A)</Form.Label>
               <Form.Control
                 type="text"
                 value={receiptNumber}
@@ -318,16 +315,12 @@ React.useEffect(() => {
             </Form.Group>
           </Col>
 
-          {/* Enhanced Dynamic Fields With Breakdown */}
           {fields.map((field) => {
             const config = fieldConfigs[field];
             if (!config) return null;
 
             const rawValue = fieldValues[field];
             const numericValue = parseFloat(rawValue);
-
-            // Only show fields with value > 0
-            if (!numericValue || numericValue <= 0) return null;
 
             return (
               <Col md={12} key={field}>
@@ -348,7 +341,7 @@ React.useEffect(() => {
                     </Button>
                   </InputGroup>
 
-                  {config.percentages.length > 0 && (
+                  {config.percentages.length > 0 && numericValue > 0 && (
                     <div className="mt-2 ms-2">
                       {config.percentages.map((p, idx) => (
                         <div
@@ -374,6 +367,35 @@ React.useEffect(() => {
               Add New Field
             </Button>
           </Col>
+
+          {showSelect && (
+            <Col md={12}>
+              <Form.Group controlId="formSelectField">
+                <Form.Label>Select Field to Add</Form.Label>
+                <Form.Select
+                  value={selectedField}
+                  onChange={(e) => {
+                    const selected = e.target.value;
+                    if (selected && !fields.includes(selected)) {
+                      setFields([...fields, selected]);
+                      setFieldValues({ ...fieldValues, [selected]: "" });
+                    }
+                    setSelectedField("");
+                    setShowSelect(false);
+                  }}
+                >
+                  <option value="">-- Select Field --</option>
+                  {fieldOptions
+                    .filter((option) => !fields.includes(option))
+                    .map((option) => (
+                      <option key={option} value={option}>
+                        {fieldConfigs[option]?.label || option}
+                      </option>
+                    ))}
+                </Form.Select>
+              </Form.Group>
+            </Col>
+          )}
 
           <Col md={12}>
             <h5 className="mt-3">Total: ₱{total.toFixed(2)}</h5>
@@ -403,7 +425,11 @@ React.useEffect(() => {
           >
             Reset
           </Button>
-          <Button variant="primary" type="submit">
+          <Button
+            variant="primary"
+            type="button" // ✅ prevent form submit
+            onClick={handleSave} // ✅ only triggers save once
+          >
             {mode === "edit" ? "Update" : "Save"}
           </Button>
         </div>
@@ -412,4 +438,4 @@ React.useEffect(() => {
   );
 }
 
-export default AbstractTF
+export default AbstractTF;

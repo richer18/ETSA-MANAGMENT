@@ -79,9 +79,9 @@ const createData = (data) => ({
 });
 
 const initialFormData = {
-  date: '',
-  barangay: '',
-  cashier: '',
+  date: "",
+  barangay: "",
+  cashier: "",
   currentYear: 0,
   currentPenalties: 0,
   currentDiscounts: 0,
@@ -100,9 +100,9 @@ const initialFormData = {
   additionalPriorPenalties: 0,
   additionalTotal: 0,
   gfTotal: 0,
-  name: '',
-  receipt: '',
-  status: '',
+  name: "",
+  receipt: "",
+  status: "",
 };
 
 
