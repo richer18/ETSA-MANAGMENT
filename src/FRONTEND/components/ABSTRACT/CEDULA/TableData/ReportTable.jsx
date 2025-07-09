@@ -1,6 +1,6 @@
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import PrintIcon from '@mui/icons-material/Print';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import PrintIcon from "@mui/icons-material/Print";
 import {
   Autocomplete,
   Box,
@@ -13,88 +13,83 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField, Typography,
-} from '@mui/material';
-import axios from 'axios';
-import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
+  TextField,
+  Typography,
+} from "@mui/material";
+import PropTypes from "prop-types";
+import React, { useEffect, useState } from "react";
+import axiosInstance from "../../../../../api/axiosInstance";
 
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 
+const months = [
+  { label: "January", value: "1" },
+  { label: "February", value: "2" },
+  { label: "March", value: "3" },
+  { label: "April", value: "4" },
+  { label: "May", value: "5" },
+  { label: "June", value: "6" },
+  { label: "July", value: "7" },
+  { label: "August", value: "8" },
+  { label: "September", value: "9" },
+  { label: "October", value: "10" },
+  { label: "November", value: "11" },
+  { label: "December", value: "12" },
+];
 
-const BASE_URL = "http://192.168.101.108:3001";
+const years = [
+  { label: "2023", value: "2023" },
+  { label: "2024", value: "2024" },
+  { label: "2025", value: "2025" },
+  { label: "2026", value: "2026" },
+  { label: "2027", value: "2027" },
+  { label: "2028", value: "2028" },
+  { label: "2029", value: "2029" },
+  { label: "2030", value: "2030" },
+];
 
-  const months = [
-    { label: 'January', value: '1' },
-    { label: 'February', value: '2' },
-    { label: 'March', value: '3' },
-    { label: 'April', value: '4' },
-    { label: 'May', value: '5' },
-    { label: 'June', value: '6' },
-    { label: 'July', value: '7' },
-    { label: 'August', value: '8' },
-    { label: 'September', value: '9' },
-    { label: 'October', value: '10' },
-    { label: 'November', value: '11' },
-    { label: 'December', value: '12' },
-  ];
-  
-  const years = [
-    { label: '2023', value: '2023' },
-    { label: '2024', value: '2024' },
-    { label: '2025', value: '2025' },
-    { label: '2026', value: '2026' },
-    { label: '2027', value: '2027' },
-    { label: '2028', value: '2028' },
-    { label: '2029', value: '2029' },
-    { label: '2030', value: '2030' },
-  ];
-
-  const formatToPeso = (amount) => `${(parseFloat(amount) || 0).toLocaleString("en-PH", { minimumFractionDigits: 2 })}`;
+const formatToPeso = (amount) =>
+  `${(parseFloat(amount) || 0).toLocaleString("en-PH", { minimumFractionDigits: 2 })}`;
 
 function ReportTable({ onBack }) {
-    const [month, setMonth] = useState({ label: 'January', value: '1' });
-      const [year, setYear] = useState({ label: '2025', value: '2025' });
+  const [month, setMonth] = useState(months[new Date().getMonth()]); // current month
+  const [year, setYear] = useState(
+    years.find((y) => y.value === new Date().getFullYear().toString())
+  );
 
-     const [data, setData] = useState({
-  TOTALAMOUNTPAID: 0,
-});
+  const [data, setData] = useState({
+    TOTALAMOUNTPAID: 0,
+  });
 
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const response = await axios.get(`${BASE_URL}/api/cedulaSummaryCollectionDataReport`, {
-        params: { month: month.value, year: year.value },
-      });
+  useEffect(() => {
+    if (!month || !year) return;
 
-      if (Array.isArray(response.data) && response.data.length > 0) {
-        // Summing the TOTALAMOUNTPAID while ensuring row values are valid
-        const totalAmountPaid = response.data.reduce(
-          (sum, row) => sum + (Number(row.Totalamountpaid) || 0),
-          0
+    const fetchData = async () => {
+      try {
+        const response = await axiosInstance.get(
+          "cedulaSummaryCollectionDataReport",
+          {
+            params: { month: month.value, year: year.value },
+          }
         );
 
-        setData({ TOTALAMOUNTPAID: totalAmountPaid });
-      } else {
-        console.warn("No data available for the selected month and year");
+        const amount = Number(response.data?.Totalamountpaid) || 0;
+        setData({ TOTALAMOUNTPAID: amount });
+      } catch (error) {
+        console.error("Error fetching data:", error);
         setData({ TOTALAMOUNTPAID: 0 });
       }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setData({ TOTALAMOUNTPAID: 0 });
-    }
-  };
+    };
 
-  fetchData();
-}, [month, year]); // Dependency array ensures re-fetching when month/year changes
+    fetchData();
+  }, [month, year]); // Dependency array ensures re-fetching when month/year changes
 
-
- // PDF Print Function
-// Inject print-specific styles
-React.useEffect(() => {
-  const style = document.createElement("style");
-  style.innerHTML = `
+  // PDF Print Function
+  // Inject print-specific styles
+  React.useEffect(() => {
+    const style = document.createElement("style");
+    style.innerHTML = `
     @media print {
       @page {
         size: 8.5in 13in portrait; /* Legal size, adjust to '8.5in 11in' for letter */
@@ -153,82 +148,94 @@ React.useEffect(() => {
       th:nth-child(12), td:nth-child(12) { width: 6%; }
     }
   `;
-  document.head.appendChild(style);
-  return () => document.head.removeChild(style);
-}, []);
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
 
-const handlePrint = () => {
-  const originalTitle = document.title;
-  document.title = `SOC_cEDULAReport_${month.label}_${year.label}`;
-  window.print();
-  document.title = originalTitle; // Restore original title
-};
-
+  const handlePrint = () => {
+    const originalTitle = document.title;
+    document.title = `SOC_cEDULAReport_${month.label}_${year.label}`;
+    window.print();
+    document.title = originalTitle; // Restore original title
+  };
 
   // 📊 Download to Excel Function
-const handleDownloadExcel = async (month, year) => {
-  const formatNumber = (num) => Number(num).toFixed(2);
+  const handleDownloadExcel = async (month, year) => {
+    const formatNumber = (num) => Number(num).toFixed(2);
 
-  try {
-    const response = await fetch("/CEDULA_TEMPLATE.xlsx");
-    if (!response.ok) throw new Error("Failed to fetch the Excel template.");
+    try {
+      const response = await fetch("/CEDULA_TEMPLATE.xlsx");
+      if (!response.ok) throw new Error("Failed to fetch the Excel template.");
 
-    const arrayBuffer = await response.arrayBuffer();
-    const workbook = XLSX.read(arrayBuffer, { type: "array" });
-    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      const arrayBuffer = await response.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: "array" });
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
 
-    const totalAmount = formatNumber(data?.TOTALAMOUNTPAID || 0);
+      const totalAmount = formatNumber(data?.TOTALAMOUNTPAID || 0);
 
-    // ✅ Helper function to update cell while preserving styles
-    const updateCell = (cellRef, value) => {
-      worksheet[cellRef] = worksheet[cellRef] || {};
-      worksheet[cellRef].v = value;
-      worksheet[cellRef].s = {
-        font: { bold: true, sz: 12 },
-        alignment: { horizontal: "center", vertical: "center" },
+      // ✅ Helper function to update cell while preserving styles
+      const updateCell = (cellRef, value) => {
+        worksheet[cellRef] = worksheet[cellRef] || {};
+        worksheet[cellRef].v = value;
+        worksheet[cellRef].s = {
+          font: { bold: true, sz: 12 },
+          alignment: { horizontal: "center", vertical: "center" },
+        };
       };
-    };
 
-    // ✅ Update the red box (Row 3, spanning E3 to H3) with dynamic month and year
-    updateCell("E3", `Month of ${month?.label || "Unknown"} ${year?.label || "Year"}`);
+      // ✅ Update the red box (Row 3, spanning E3 to H3) with dynamic month and year
+      updateCell(
+        "E3",
+        `Month of ${month?.label || "Unknown"} ${year?.label || "Year"}`
+      );
 
-    // Ensure valid merge range (E3 to H3)
-    worksheet["!merges"] = worksheet["!merges"] || [];
-    worksheet["!merges"].push({ s: { r: 2, c: 4 }, e: { r: 2, c: 7 } });
+      // Ensure valid merge range (E3 to H3)
+      worksheet["!merges"] = worksheet["!merges"] || [];
+      worksheet["!merges"].push({ s: { r: 2, c: 4 }, e: { r: 2, c: 7 } });
 
-    // ✅ Update other cells (example data)
-    updateCell("A7", "Com Tax Cert.");
-    updateCell("B7", totalAmount);
-    updateCell("G7", totalAmount);
-    updateCell("J7", totalAmount);
+      // ✅ Update other cells (example data)
+      updateCell("A7", "Com Tax Cert.");
+      updateCell("B7", totalAmount);
+      updateCell("G7", totalAmount);
+      updateCell("J7", totalAmount);
 
-    updateCell("A8", "TOTAL");
-    updateCell("B8", totalAmount);
-    updateCell("G8", totalAmount);
-    updateCell("J8", totalAmount);
+      updateCell("A8", "TOTAL");
+      updateCell("B8", totalAmount);
+      updateCell("G8", totalAmount);
+      updateCell("J8", totalAmount);
 
-    // ✅ Dynamic filename
-    const now = new Date();
-    const formattedDateTime = now.toISOString().replace(/:/g, "-").replace("T", "_").split(".")[0];
-    const fileName = `Summary_of_Collections_${formattedDateTime}.xlsx`;
+      // ✅ Dynamic filename
+      const now = new Date();
+      const formattedDateTime = now
+        .toISOString()
+        .replace(/:/g, "-")
+        .replace("T", "_")
+        .split(".")[0];
+      const fileName = `Summary_of_Collections_${formattedDateTime}.xlsx`;
 
-    // ✅ Write and download the updated Excel
-    const updatedExcel = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    saveAs(new Blob([updatedExcel], { type: "application/octet-stream" }), fileName);
+      // ✅ Write and download the updated Excel
+      const updatedExcel = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+      saveAs(
+        new Blob([updatedExcel], { type: "application/octet-stream" }),
+        fileName
+      );
 
-    console.log("✅ Excel successfully generated with dynamic Month & Year!");
-  } catch (error) {
-    console.error("❌ Error handling Excel template: ", error);
-  }
-};
+      console.log("✅ Excel successfully generated with dynamic Month & Year!");
+    } catch (error) {
+      console.error("❌ Error handling Excel template: ", error);
+    }
+  };
 
-      const handleMonthChange = (event, value) => {
-        setMonth(value || { label: 'January', value: '1' });
-      };
-    
-      const handleYearChange = (event, value) => {
-        setYear(value || { label: '2024', value: '2024' });
-      };
+  const handleMonthChange = (event, value) => {
+    setMonth(value || { label: "January", value: "1" });
+  };
+
+  const handleYearChange = (event, value) => {
+    setYear(value || { label: "2024", value: "2024" });
+  };
   return (
     <>
       <Box
@@ -584,4 +591,4 @@ ReportTable.propTypes = {
   onBack: PropTypes.func.isRequired,
 };
 
-export default ReportTable
+export default ReportTable;

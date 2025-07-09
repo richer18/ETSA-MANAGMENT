@@ -1,6 +1,6 @@
 // Make sure you have all necessary imports installed and adjust the import paths to match your folder structure.
 import ReceiptIcon from "@mui/icons-material/Receipt";
-import SearchIcon from '@mui/icons-material/Search';
+import SearchIcon from "@mui/icons-material/Search";
 import {
   Alert,
   Autocomplete,
@@ -11,7 +11,8 @@ import {
   Chip,
   Dialog,
   DialogActions,
-  DialogContent, DialogContentText,
+  DialogContent,
+  DialogContentText,
   DialogTitle,
   InputAdornment,
   Menu,
@@ -27,16 +28,16 @@ import {
   TableRow,
   TextField,
   Tooltip,
-  Typography
-} from '@mui/material';
-import TablePagination from '@mui/material/TablePagination';
+  Typography,
+} from "@mui/material";
+import TablePagination from "@mui/material/TablePagination";
 import axios from "axios";
-import { saveAs } from 'file-saver'; // npm install file-saver
-import React, { useEffect, useState } from 'react';
+import { saveAs } from "file-saver"; // npm install file-saver
+import React, { useEffect, useState } from "react";
 import { BiSolidReport } from "react-icons/bi";
 import { IoMdAdd, IoMdDownload } from "react-icons/io";
 import { IoToday } from "react-icons/io5";
-import * as XLSX from 'xlsx'; // npm install xlsx
+import * as XLSX from "xlsx"; // npm install xlsx
 
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
@@ -46,19 +47,19 @@ import StorefrontIcon from "@mui/icons-material/Storefront";
 
 // ---- Adjust these imports to your actual file paths ----
 import axiosInstance from "../../../../api/axiosInstance";
-import AbstractGF from '../../../../components/MD-Components/FillupForm/AbstractGF';
-import GeneralFundDialogPopupDAILY from '../../../../components/MD-Components/Popup/components/GeneralFundPopup/GeneralFundDialogPopupDailyTable';
-import GeneralFundDialogPopupRFEE from '../../../../components/MD-Components/Popup/components/GeneralFundPopup/GeneralFundDialogPopupRFEE';
-import GeneralFundDialogPopupSUC from '../../../../components/MD-Components/Popup/components/GeneralFundPopup/GeneralFundDialogPopupSUC';
-import GeneralFundDialogPopupTOTAL from '../../../../components/MD-Components/Popup/components/GeneralFundPopup/GeneralFundDialogPopupTOTAL';
-import GeneralFundDialogPopupRF from '../../../../components/MD-Components/Popup/components/GeneralFundPopup/GeneralFundReportPopupRF';
-import GeneralFundDialogPopupTOB from '../../../../components/MD-Components/Popup/components/GeneralFundPopup/GeneralFundReportPopupTOB';
-import GeneralFundDialog from '../../../../components/MD-Components/Popup/GeneralFundDialog';
-import PopupDialog from '../../../../components/MD-Components/Popup/PopupDialogGF_FORM';
-import DailyTable from './TableData/DailyTable';
-import ReportTable from './TableData/ReportTable';
+import AbstractGF from "../../../../components/MD-Components/FillupForm/AbstractGF";
+import GeneralFundDialogPopupDAILY from "../../../../components/MD-Components/Popup/components/GeneralFundPopup/GeneralFundDialogPopupDailyTable";
+import GeneralFundDialogPopupRFEE from "../../../../components/MD-Components/Popup/components/GeneralFundPopup/GeneralFundDialogPopupRFEE";
+import GeneralFundDialogPopupSUC from "../../../../components/MD-Components/Popup/components/GeneralFundPopup/GeneralFundDialogPopupSUC";
+import GeneralFundDialogPopupTOTAL from "../../../../components/MD-Components/Popup/components/GeneralFundPopup/GeneralFundDialogPopupTOTAL";
+import GeneralFundDialogPopupRF from "../../../../components/MD-Components/Popup/components/GeneralFundPopup/GeneralFundReportPopupRF";
+import GeneralFundDialogPopupTOB from "../../../../components/MD-Components/Popup/components/GeneralFundPopup/GeneralFundReportPopupTOB";
+import GeneralFundDialog from "../../../../components/MD-Components/Popup/GeneralFundDialog";
+import PopupDialog from "../../../../components/MD-Components/Popup/PopupDialogGF_FORM";
+import DailyTable from "./TableData/DailyTable";
+import ReportTable from "./TableData/ReportTable";
 
-import GenerateReport from './TableData/GenerateReport';
+import GenerateReport from "./TableData/GenerateReport";
 // --------------------------------------------------------
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -76,8 +77,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 // Function to format date
 const formatDate = (dateString) => {
   const date = new Date(dateString);
-  const options = { month: 'short', day: 'numeric', year: 'numeric' };
-  return date.toLocaleDateString('en-US', options);
+  const options = { month: "short", day: "numeric", year: "numeric" };
+  return date.toLocaleDateString("en-US", options);
 };
 const FloraMyImg = "/assets/images/Flora_My.jpg";
 const RicardoImg = "/assets/images/Ricardo_Enopia.jpg";
@@ -85,9 +86,9 @@ const RowenaImg = "/assets/images/Rowena_Gaer.jpg";
 
 // Map of cashier names to image paths
 const cashierImages = {
-  'FLORA MY': FloraMyImg,
-  'ROWENA': RowenaImg,
-  'RICARDO': RicardoImg,
+  "FLORA MY": FloraMyImg,
+  ROWENA: RowenaImg,
+  RICARDO: RicardoImg,
 };
 
 const months = [
@@ -113,8 +114,7 @@ const years = [
   { label: "2027", value: "2027" },
   { label: "2028", value: "2028" },
   { label: "2029", value: "2029" },
-];  
-
+];
 
 function GeneralFund() {
   // Dialog states
@@ -272,7 +272,6 @@ function GeneralFund() {
 
     fetchAllData();
   }, []);
-
 
   const getFilteredDataByMonthYear = () => {
     if (!month || !year) return filteredData;
@@ -515,7 +514,6 @@ function GeneralFund() {
       setSelectedId(null);
     }
   };
-  
 
   return (
     <Box

@@ -1,11 +1,20 @@
-import { keyframes } from "@emotion/react";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import PercentIcon from "@mui/icons-material/Percent";
+import ReceiptIcon from "@mui/icons-material/Receipt";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import SearchIcon from "@mui/icons-material/Search";
 import {
   Autocomplete,
   Box,
   Button,
   Card,
-  InputAdornment,Dialog,DialogActions,DialogContent,DialogContentText,DialogTitle,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  InputAdornment,
   Menu,
   MenuItem,
   Paper,
@@ -21,11 +30,11 @@ import {
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import axiosInstance from "../../../../api/axiosInstance";
 
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 
-import axios from "axios";
 import { saveAs } from "file-saver";
 import React, { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
@@ -41,35 +50,19 @@ import ReportTable from "./TableData/ReportTable";
 
 import CedulaFundDialog from "../../../../components/MD-Components/Popup/CedulaFundDialog";
 
-import GenerateReport from './TableData/GenerateReport';
+import GenerateReport from "./TableData/GenerateReport";
 // ------------------------
 //  Styled components
 // ------------------------
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.main,
-  color: theme.palette.common.white,
+  whiteSpace: "nowrap",
   fontWeight: "bold",
   textAlign: "center",
+  background: "linear-gradient(135deg, #1976d2, #63a4ff)",
+  color: theme.palette.common.white,
+  borderBottom: `2px solid ${theme.palette.primary.dark}`,
+  fontSize: 14,
 }));
-
-const bounce = keyframes`
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-10px);
-  }
-  60% {
-    transform: translateY(-5px);
-  }
-`;
-
-const AnimatedButton = styled(Button)`
-  &:hover {
-    animation: ${bounce} 1s ease;
-  }
-`;
-
 // ------------------------
 //  Month / Year Options
 // ------------------------
@@ -106,9 +99,6 @@ const formatDate = (dateString) => {
   const options = { month: "short", day: "numeric", year: "numeric" };
   return date.toLocaleDateString("en-US", options);
 };
-
-const BASE_URL = "http://192.168.101.108:3001"; // Define base URL
-
 
 // ------------------------
 //   Main Component
@@ -157,39 +147,39 @@ function Cedula({ ...props }) {
   });
 
   const [rows, setRows] = React.useState([]);
-      const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-      const [selectedId, setSelectedId] = useState(null);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
-      const [reportDialog, setReportDialog] = useState({
-              open: false,
-              status: 'idle', // 'idle' | 'loading' | 'success' | 'error'
-              progress: 0
-            });
-          
-            const ChhandleCloseDialog = () => {
-              setReportDialog({ ...reportDialog, open: false });
-            };
-        
-            const handleGenerateReport = () => {
-              // Open dialog in loading state
-              setReportDialog({
-                open: true,
-                status: 'loading',
-                progress: 0
-              });
-          
-              // Simulate report generation
-              const interval = setInterval(() => {
-                setReportDialog(prev => {
-                  const newProgress = prev.progress + 10;
-                  if (newProgress >= 100) {
-                    clearInterval(interval);
-                    return { ...prev, status: 'success', progress: 100 };
-                  }
-                  return { ...prev, progress: newProgress };
-                });
-              }, 300);
-            };
+  const [reportDialog, setReportDialog] = useState({
+    open: false,
+    status: "idle", // 'idle' | 'loading' | 'success' | 'error'
+    progress: 0,
+  });
+
+  const ChhandleCloseDialog = () => {
+    setReportDialog({ ...reportDialog, open: false });
+  };
+
+  const handleGenerateReport = () => {
+    // Open dialog in loading state
+    setReportDialog({
+      open: true,
+      status: "loading",
+      progress: 0,
+    });
+
+    // Simulate report generation
+    const interval = setInterval(() => {
+      setReportDialog((prev) => {
+        const newProgress = prev.progress + 10;
+        if (newProgress >= 100) {
+          clearInterval(interval);
+          return { ...prev, status: "success", progress: 100 };
+        }
+        return { ...prev, progress: newProgress };
+      });
+    }, 300);
+  };
 
   // ------------------------
   //  1) Fetch data once
@@ -197,14 +187,14 @@ function Cedula({ ...props }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/api/cedula`);
+        const response = await axiosInstance.get("/cedula");
         setData(response.data);
         setFilteredData(response.data); // Initialize with the full dataset
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-  
+
     fetchData();
   }, []);
 
@@ -213,15 +203,15 @@ function Cedula({ ...props }) {
   // ------------------------
   const getFilteredDataByMonthYear = () => {
     if (!month || !year) return filteredData;
-  
+
     return filteredData.filter((row) => {
       if (!row.DATE) return false;
       const rowDate = new Date(row.DATE);
-      
+
       const monthMatches = rowDate.getMonth() + 1 === Number(month);
       const yearMatches = rowDate.getFullYear() === Number(year);
       const dayMatches = day ? rowDate.getDate() === Number(day) : true;
-  
+
       return monthMatches && yearMatches && dayMatches;
     });
   };
@@ -234,9 +224,9 @@ function Cedula({ ...props }) {
       setFilteredData([]);
       return;
     }
-  
+
     let newFiltered = data;
-  
+
     // (a) Filter by searchQuery
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -246,7 +236,7 @@ function Cedula({ ...props }) {
         return rowName.includes(q) || rowCtcNo.includes(q);
       });
     }
-  
+
     // (b) Filter by month, day, and year
     if (month || year || day) {
       newFiltered = newFiltered.filter((row) => {
@@ -255,15 +245,15 @@ function Cedula({ ...props }) {
         const rowMonth = rowDate.getMonth() + 1;
         const rowDay = rowDate.getDate();
         const rowYear = rowDate.getFullYear();
-  
+
         const monthMatches = month ? rowMonth === parseInt(month) : true;
         const dayMatches = day ? rowDay === parseInt(day) : true;
         const yearMatches = year ? rowYear === parseInt(year) : true;
-  
+
         return monthMatches && dayMatches && yearMatches;
       });
     }
-  
+
     setFilteredData(newFiltered);
     setPage(0); // reset pagination when filters change
   }, [data, searchQuery, month, day, year]);
@@ -443,7 +433,7 @@ function Cedula({ ...props }) {
 
   const handleConfirmDelete = async () => {
     if (!selectedId) return;
-    
+
     try {
       const response = await fetch(`/api/deleteCedula/${selectedId}`, {
         method: "DELETE",
@@ -453,7 +443,7 @@ function Cedula({ ...props }) {
 
       if (response.ok) {
         alert("Record deleted successfully");
-        setRows(prev => prev.filter(row => row.id !== selectedId));
+        setRows((prev) => prev.filter((row) => row.id !== selectedId));
       } else {
         alert(result.error || "Failed to delete record");
       }
@@ -474,7 +464,6 @@ function Cedula({ ...props }) {
       sx={{
         flexGrow: 1,
         padding: 3,
-        backgroundColor: "#f5f5f5",
         minHeight: "100vh",
       }}
     >
@@ -482,12 +471,7 @@ function Cedula({ ...props }) {
         {/* Toolbar Section */}
         <Box display="flex" flexDirection="column" gap={3}>
           {/* Search & Filters Row */}
-          <Box
-            display="flex"
-            alignItems="center"
-            gap={3}
-            sx={{ py: 2, borderBottom: "1px solid rgba(0, 0, 0, 0.12)" }}
-          >
+          <Box display="flex" alignItems="center" gap={3}>
             {showFilters && (
               <Box display="flex" alignItems="center" gap={2} flexGrow={1}>
                 <TextField
@@ -526,15 +510,22 @@ function Cedula({ ...props }) {
                     onChange={(e, v) => setMonth(v?.value)}
                   />
                   {/* Day Filter */}
-                  
+
                   <Autocomplete
-                  disablePortal
-                  options={[...Array(31)].map((_, i) => ({ label: `${i + 1}`, value: i + 1 }))}
-                  sx={{ width: 140 }}
-                  renderInput={(params) => (
-                  <TextField {...params} label="Select Day" variant="outlined" />
-                )}
-                onChange={(e, v) => setDay(v?.value)}
+                    disablePortal
+                    options={[...Array(31)].map((_, i) => ({
+                      label: `${i + 1}`,
+                      value: i + 1,
+                    }))}
+                    sx={{ width: 140 }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Select Day"
+                        variant="outlined"
+                      />
+                    )}
+                    onChange={(e, v) => setDay(v?.value)}
                   />
 
                   <Autocomplete
@@ -575,86 +566,147 @@ function Cedula({ ...props }) {
           {/* Action Buttons Row */}
           <Box display="flex" alignItems="center" gap={2} sx={{ py: 1 }}>
             <Box display="flex" gap={2} flexGrow={1}>
-              <Tooltip title="Add New Entry">
+              {/* New Entry - Primary CTA */}
+              <Tooltip title="Add New Entry" arrow>
                 <Button
                   variant="contained"
-                  startIcon={<IoMdAdd size={20} />}
+                  startIcon={<IoMdAdd size={18} />}
                   sx={{
-                    px: 4,
+                    px: 3.5,
                     backgroundColor: "#1976d2",
-                    "&:hover": { backgroundColor: "#1565c0" },
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "#1565c0",
+                      transform: "translateY(-1px)",
+                      boxShadow: "0 3px 10px rgba(25, 118, 210, 0.3)",
+                    },
                     textTransform: "none",
-                    fontSize: 16,
+                    fontSize: 15,
+                    fontWeight: 600,
+                    borderRadius: "10px",
+                    minWidth: "130px",
+                    height: "44px",
+                    transition: "all 0.2s ease",
+                    boxShadow: "0 2px 6px rgba(25, 118, 210, 0.2)",
                   }}
-                  onClick={() => handleClickOpen(<Cedulas />)}
+                  onClick={() =>
+                    handleClickOpen(<Cedulas onClose={handleClose} />)
+                  }
                 >
                   New Entry
                 </Button>
               </Tooltip>
 
-              <Tooltip title="Generate Daily Report">
+              {/* Daily Report */}
+              <Tooltip title="Generate Daily Report" arrow>
                 <Button
                   variant="contained"
                   color="success"
-                  startIcon={<IoToday size={18} />}
+                  startIcon={<IoToday size={16} />}
                   sx={{
-                    px: 4,
+                    px: 3.5,
+                    backgroundColor: "#2e7d32",
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "#1b5e20",
+                      transform: "translateY(-1px)",
+                    },
                     textTransform: "none",
-                    fontSize: 16,
+                    fontSize: 15,
+                    fontWeight: 600,
+                    borderRadius: "10px",
+                    minWidth: "130px",
+                    height: "44px",
+                    transition: "all 0.2s ease",
+                    boxShadow: "0 2px 6px rgba(46, 125, 50, 0.2)",
                   }}
                   onClick={toggleDailyTable}
                 >
-                  Daily Summary
+                  Daily Report
                 </Button>
               </Tooltip>
 
-              <Tooltip title="Generate Receipt Report">
-                            <Button
-                              variant="contained"
-                              color="success"
-                              onClick={handleGenerateReport}
-                              startIcon={<IoToday size={18} />}
-                              sx={{
-                                px: 4,
-                                textTransform: "none",
-                                fontSize: 16,
-                              }}
-                            >
-                              Check Receipt
-                            </Button>
-                          </Tooltip>
+              {/* Check Receipt */}
+              <Tooltip title="Generate Receipt Report" arrow>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  startIcon={<ReceiptIcon size={16} />}
+                  sx={{
+                    px: 3.5,
+                    backgroundColor: "#7b1fa2",
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "#6a1b9a",
+                      transform: "translateY(-1px)",
+                    },
+                    textTransform: "none",
+                    fontSize: 15,
+                    fontWeight: 600,
+                    borderRadius: "10px",
+                    minWidth: "130px",
+                    height: "44px",
+                    transition: "all 0.2s ease",
+                    boxShadow: "0 2px 6px rgba(123, 31, 162, 0.2)",
+                  }}
+                  onClick={handleGenerateReport}
+                >
+                  Check Receipt
+                </Button>
+              </Tooltip>
             </Box>
 
             <Box display="flex" gap={2}>
-              <Tooltip title="Financial Report">
-                <AnimatedButton
+              {/* Financial Report */}
+              <Tooltip title="Financial Reports" arrow>
+                <Button
                   variant="contained"
                   color="error"
                   startIcon={<BiSolidReport size={18} />}
-                  sx={{
-                    px: 4,
-                    textTransform: "none",
-                    fontSize: 16,
-                  }}
                   onClick={toggleReportTable}
+                  sx={{
+                    px: 3,
+                    height: 44,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    textTransform: "none",
+                    borderRadius: 2,
+                    boxShadow: 2,
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      backgroundColor: "error.dark",
+                      transform: "translateY(-1px)",
+                    },
+                  }}
                 >
                   Financial Report
-                </AnimatedButton>
+                </Button>
               </Tooltip>
 
-              <Tooltip title="Export Data">
+              {/* Download */}
+              <Tooltip title="Export Data" arrow>
                 <Button
                   variant="contained"
                   color="info"
                   startIcon={<IoMdDownload size={18} />}
-                  sx={{
-                    px: 4,
-                    textTransform: "none",
-                    fontSize: 16,
-                  }}
                   onClick={handleDownload}
+                  sx={{
+                    px: 3,
+                    height: 44,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    textTransform: "none",
+                    color: "white",
+                    borderRadius: 2,
+                    boxShadow: 2,
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      backgroundColor: "info.dark",
+                      transform: "translateY(-1px)",
+                    },
+                  }}
                 >
-                  Export
+                  Download
                 </Button>
               </Tooltip>
             </Box>
@@ -666,39 +718,140 @@ function Cedula({ ...props }) {
           display="flex"
           justifyContent="space-between"
           gap={3}
-          sx={{ mt: 4 }}
+          sx={{
+            mt: 4,
+            flexDirection: { xs: "column", sm: "row" }, // Responsive layout
+          }}
         >
           {[
-            { value: totalAmount, text: "Total Revenue" },
-            { value: totalBasic, text: "Basic Income" },
-            { value: totalTaxDue, text: "Tax Liability" },
-            { value: totalInterest, text: "Accrued Interest" },
-          ].map(({ value, text }) => (
+            {
+              value: totalAmount,
+              text: "Total Revenue",
+              icon: <AccountBalanceIcon />,
+              gradient: "linear-gradient(135deg, #1976d2, #63a4ff)",
+            },
+            {
+              value: totalBasic,
+              text: "Basic Income",
+              icon: <MonetizationOnIcon />,
+              gradient: "linear-gradient(135deg, #2e7d32, #66bb6a)",
+            },
+            {
+              value: totalTaxDue,
+              text: "Tax Liability",
+              icon: <ReceiptLongIcon />,
+              gradient: "linear-gradient(135deg, #ed6c02, #ffb74d)",
+            },
+            {
+              value: totalInterest,
+              text: "Accrued Interest",
+              icon: <PercentIcon />,
+              gradient: "linear-gradient(135deg, #6a1b9a, #ab47bc)",
+            },
+          ].map(({ value, text, icon, gradient }) => (
             <Card
-              key={text} // ✅ Use `text` as a unique key
+              key={text}
               sx={{
                 flex: 1,
-                p: 2.5,
-                borderRadius: "12px",
-                background: "linear-gradient(135deg, #3f51b5, #5c6bc0)",
+                p: 3,
+                borderRadius: "16px",
+                background: gradient,
                 color: "white",
-                boxShadow: "0 8px 24px rgba(63,81,181,0.15)",
-                transition: "transform 0.3s ease",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+                transition: "all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)",
                 cursor: "pointer",
-                "&:hover": { transform: "translateY(-4px)" },
+                position: "relative",
+                overflow: "hidden",
+                minWidth: 0,
+                "&:hover": {
+                  transform: "translateY(-6px)",
+                  boxShadow: "0 12px 40px rgba(0,0,0,0.2)",
+                },
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  top: "-50%",
+                  right: "-50%",
+                  width: "100%",
+                  height: "100%",
+                  background: "rgba(255,255,255,0.08)",
+                  transform: "rotate(25deg)",
+                  transition: "all 0.4s ease",
+                },
+                "&:hover::before": {
+                  transform: "rotate(25deg) translate(15%, 15%)",
+                },
               }}
             >
-              <Typography variant="subtitle2" sx={{ opacity: 0.9, mb: 0.5 }}>
-                {text}
-              </Typography>
-              <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                {typeof value === "number"
-                  ? `₱ ${value.toLocaleString("en-PH", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}`
-                  : value}
-              </Typography>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="flex-start"
+              >
+                <Box>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      opacity: 0.9,
+                      mb: 0.5,
+                      fontSize: "0.875rem",
+                      fontWeight: 500,
+                      letterSpacing: "0.5px",
+                    }}
+                  >
+                    {text}
+                  </Typography>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: "1.5rem",
+                      lineHeight: 1.2,
+                      mb: 1,
+                    }}
+                  >
+                    {typeof value === "number"
+                      ? `₱ ${value.toLocaleString("en-PH", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}`
+                      : value}
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    opacity: 0.2,
+                    position: "absolute",
+                    right: 20,
+                    top: 20,
+                    "& svg": {
+                      fontSize: "3rem",
+                    },
+                  }}
+                >
+                  {icon}
+                </Box>
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center", mt: 1.5 }}>
+                <Box
+                  sx={{
+                    width: "100%",
+                    height: "4px",
+                    backgroundColor: "rgba(255,255,255,0.3)",
+                    borderRadius: "2px",
+                    overflow: "hidden",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: "70%", // Adjust dynamically if needed
+                      height: "100%",
+                      backgroundColor: "white",
+                      borderRadius: "2px",
+                    }}
+                  />
+                </Box>
+              </Box>
             </Card>
           ))}
         </Box>
@@ -763,7 +916,17 @@ function Cedula({ ...props }) {
                       {parseFloat(row.INTEREST).toFixed(2)}
                     </TableCell>
                     <TableCell align="center">
-                      {parseFloat(row.TOTALAMOUNTPAID).toFixed(2)}
+                      <Typography
+                        variant="body2"
+                        fontWeight={600}
+                        color="success.main"
+                      >
+                        {new Intl.NumberFormat("en-PH", {
+                          style: "currency",
+                          currency: "PHP",
+                          minimumFractionDigits: 2,
+                        }).format(row.TOTALAMOUNTPAID)}
+                      </Typography>
                     </TableCell>
                     <TableCell align="center">{row.CASHIER}</TableCell>
                     <TableCell align="center">
@@ -811,8 +974,14 @@ function Cedula({ ...props }) {
       >
         <MenuItem onClick={handleViewClick}>View</MenuItem>
         <MenuItem onClick={handleEditClick}>Edit</MenuItem>
-        <MenuItem onClick={(e) => {e.stopPropagation(); setSelectedId(rows.id);setOpenDeleteDialog(true);}}>
-        Delete
+        <MenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            setSelectedId(rows.id);
+            setOpenDeleteDialog(true);
+          }}
+        >
+          Delete
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -832,34 +1001,32 @@ function Cedula({ ...props }) {
       )}
 
       {/* Confirmation Dialog */}
-                  <Dialog
-                          open={openDeleteDialog}
-                          onClose={() => setOpenDeleteDialog(false)}
-                          maxWidth="xs"
-                          fullWidth
-                        >
-                          <DialogTitle>Confirm Delete</DialogTitle>
-                          <DialogContent>
-                            <DialogContentText>
-                              Are you sure you want to delete this record? This action cannot be undone.
-                            </DialogContentText>
-                          </DialogContent>
-                          <DialogActions>
-                            <Button 
-                              onClick={() => setOpenDeleteDialog(false)}
-                              color="primary"
-                            >
-                              Cancel
-                            </Button>
-                            <Button 
-                              onClick={handleConfirmDelete}
-                              color="error"
-                              variant="contained"
-                            >
-                              Confirm Delete
-                            </Button>
-                          </DialogActions>
-                        </Dialog>
+      <Dialog
+        open={openDeleteDialog}
+        onClose={() => setOpenDeleteDialog(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this record? This action cannot be
+            undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDeleteDialog(false)} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            color="error"
+            variant="contained"
+          >
+            Confirm Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Box {...props}>
         {/*Snackbar Component (with prop fixes)*/}
@@ -880,12 +1047,12 @@ function Cedula({ ...props }) {
         </Snackbar>
       </Box>
 
-      <GenerateReport 
-                    open={reportDialog.open}
-                    onClose={ChhandleCloseDialog}
-                    status={reportDialog.status}
-                    progress={reportDialog.progress}
-                  />
+      <GenerateReport
+        open={reportDialog.open}
+        onClose={ChhandleCloseDialog}
+        status={reportDialog.status}
+        progress={reportDialog.progress}
+      />
     </Box>
   );
 }
