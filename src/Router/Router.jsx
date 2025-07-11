@@ -7,6 +7,7 @@ import Cedula from "../FRONTEND/components/ABSTRACT/CEDULA/Cedula";
 import GeneralFund from "../FRONTEND/components/ABSTRACT/GF/GeneralFund";
 import RealPropertyTax from "../FRONTEND/components/ABSTRACT/RPT/RealPropertyTax";
 import TrustFund from "../FRONTEND/components/ABSTRACT/TF/TrustFund";
+import Zawde from "../FRONTEND/components/WATERWORKS";
 
 import Calendar from "../FRONTEND/components/CALENDAR/index";
 
@@ -58,6 +59,8 @@ function Routers() {
           <Route path="renew-application" element={<RenewalForm />} />
           <Route path="business-operation" element={<BusinessOperation />} />
           <Route path="business-address" element={<BusinessAddress />} />
+
+          <Route path="water-works" element={<Zawde />} />
         </Route>
       </Routes>
     </Router>

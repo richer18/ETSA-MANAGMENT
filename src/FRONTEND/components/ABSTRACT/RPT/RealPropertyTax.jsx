@@ -14,7 +14,7 @@ import {
   DialogContentText,
   DialogTitle,
   TextField,
-  Tooltip
+  Tooltip,
 } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
@@ -44,7 +44,10 @@ import { MdSummarize } from "react-icons/md";
 import * as XLSX from "xlsx";
 import axios from "../../../../api/axiosInstance";
 import RealPropertyTaxAbstract from "../../../../components/MD-Components/FillupForm/AbstractRPT";
-import { default as PopupDialog, default as PopupDialogView, } from "../../../../components/MD-Components/Popup/PopupDialogRPT_FORM";
+import {
+  default as PopupDialog,
+  default as PopupDialogView,
+} from "../../../../components/MD-Components/Popup/PopupDialogRPT_FORM";
 import DailyTable from "./TableData/DailyTable";
 import GenerateReport from "./TableData/GenerateReport";
 import ReportTable from "./TableData/ReportTable";
@@ -1112,6 +1115,7 @@ function RealPropertyTax() {
             </Tooltip>
           </Box>
         </Box>
+
         {/* Enhanced Summary Cards */}
         <Box
           display="flex"

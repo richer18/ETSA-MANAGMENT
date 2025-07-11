@@ -153,7 +153,7 @@ const NAVIGATION = [
     icon: <AssignmentIcon sx={{ color: "primary.main" }} />,
   },
   {
-    segment: "water",
+    segment: "water-works",
     title: "WATER",
     icon: <WaterDropIcon sx={{ color: "info.main" }} />,
   },

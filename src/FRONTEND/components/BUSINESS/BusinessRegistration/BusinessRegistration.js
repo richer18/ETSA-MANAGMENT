@@ -12,7 +12,7 @@ import {
   NewReleases,
   Pending,
   Search,
-  Warning
+  Warning,
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -21,7 +21,6 @@ import {
   Card,
   Chip,
   Divider,
-  Grid,
   IconButton,
   InputAdornment,
   LinearProgress,
@@ -39,10 +38,9 @@ import {
   Tabs,
   TextField,
   Typography,
-  useTheme
+  useTheme,
 } from "@mui/material";
 import { useState } from "react";
-
 import ModalBusiness from "./components/Modal";
 // Modern color palette
 const colors = {
@@ -54,7 +52,6 @@ const colors = {
   dark: "#212529",
   light: "#f8f9fa",
 };
-
 
 // Sample data with modern business types
 const registrations = [
@@ -155,7 +152,6 @@ const BusinessRegistrationDashboard = () => {
     if (tabValue === "all") return matchesSearch;
     return reg.status === tabValue && matchesSearch;
   });
-  
 
   return (
     <Box
@@ -214,136 +210,144 @@ const BusinessRegistrationDashboard = () => {
       </Box>
 
       {/* Stats Cards - Modern Layout */}
-      <Grid container spacing={3} mb={4}>
+      <Box
+        display="flex"
+        flexWrap="wrap"
+        gap={3}
+        sx={{
+          mt: 2,
+          flexDirection: { xs: "column", sm: "row" },
+          justifyContent: "flex-start",
+        }}
+      >
         {[
           {
             title: "Total Registered",
             value: "1,248",
-            icon: <Business fontSize="medium" sx={{ color: colors.primary }} />,
-            color: colors.primary,
-            onClick: () => {
-              console.log("Card clicked: navigating to Total REgistteres");
-            },
+            icon: <Business fontSize="large" />,
+            color: "#1976d2",
+            gradient: "linear-gradient(135deg, #1976d2, #63a4ff)",
+            onClick: () => console.log("Navigating to Total Registered"),
           },
           {
             title: "Renewals",
             value: "892",
-            icon: (
-              <Autorenew fontSize="medium" sx={{ color: colors.secondary }} />
-            ),
-            color: colors.secondary,
-            onClick: () => {
-              console.log("Card clicked: navigating to Total Renew");
-            },
+            icon: <Autorenew fontSize="large" />,
+            color: "#9c27b0",
+            gradient: "linear-gradient(135deg, #9c27b0, #ce93d8)",
+            onClick: () => console.log("Navigating to Renewals"),
           },
           {
             title: "New Registrations",
             value: "356",
-            icon: (
-              <NewReleases fontSize="medium" sx={{ color: colors.success }} />
-            ),
-            color: colors.success,
-            onClick: () => {
-              console.log("Card clicked: navigating to Total New");
-            },
+            icon: <NewReleases fontSize="large" />,
+            color: "#4caf50",
+            gradient: "linear-gradient(135deg, #4caf50, #81c784)",
+            onClick: () => console.log("Navigating to New Registrations"),
           },
           {
             title: "Expiring Soon",
             value: "128",
-            icon: <Warning fontSize="medium" sx={{ color: colors.warning }} />,
-            color: colors.warning,
-            onClick: () => {
-              console.log("Card clicked: navigating to Total Expire");
-            },
+            icon: <Warning fontSize="large" />,
+            color: "#ff9800",
+            gradient: "linear-gradient(135deg, #ff9800, #ffcc80)",
+            onClick: () => console.log("Navigating to Expiring Soon"),
           },
           {
             title: "Closed Businesses",
             value: "42",
-            icon: <Cancel fontSize="medium" sx={{ color: colors.error }} />,
-            color: colors.error,
-            onClick: () => {
-              console.log("Card clicked: navigating to Total Close Business");
-            },
+            icon: <Cancel fontSize="large" />,
+            color: "#f44336",
+            gradient: "linear-gradient(135deg, #f44336, #ef9a9a)",
+            onClick: () => console.log("Navigating to Closed Businesses"),
           },
           {
             title: "Revenue Collected",
             value: "₱1.84M",
-            icon: <AttachMoney fontSize="medium" sx={{ color: "#4caf50" }} />,
-            color: "#4caf50",
-            onClick: () => {
-              console.log(
-                "Card clicked: navigating to Total Revenue Collected"
-              );
-            },
+            icon: <AttachMoney fontSize="large" />,
+            color: "#2e7d32",
+            gradient: "linear-gradient(135deg, #2e7d32, #81c784)",
+            onClick: () => console.log("Navigating to Revenue Collected"),
           },
         ].map((stat, index) => (
-          <Grid item xs={12} sm={6} md={4} lg={2} key={index}>
-            <Card
+          <Box
+            key={index}
+            onClick={stat.onClick}
+            sx={{
+              flex: "1 1 220px",
+              minWidth: "220px",
+              p: 4,
+              borderRadius: 5,
+              background: stat.gradient,
+              color: "#fff",
+              boxShadow: `0 10px 30px ${stat.color}60`,
+              textAlign: "center",
+              cursor: "pointer",
+              transition: "all 0.35s ease",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "relative",
+              overflow: "hidden",
+              "&:hover": {
+                transform: "translateY(-6px) scale(1.02)",
+                boxShadow: `0 18px 36px ${stat.color}80`,
+              },
+              "&::after": {
+                content: '""',
+                position: "absolute",
+                width: "140%",
+                height: "140%",
+                top: "-20%",
+                left: "-20%",
+                background:
+                  "radial-gradient(circle at center, rgba(255,255,255,0.06), transparent)",
+                zIndex: 0,
+              },
+            }}
+          >
+            <Box
               sx={{
-                p: 2,
-                cursor: "pointer",
-                height: "100%",
-                borderRadius: 3,
-                boxShadow: "0 2px 16px rgba(0,0,0,0.08)",
-                borderLeft: `4px solid ${stat.color}`,
-                transition: "transform 0.3s",
-                "&:hover": {
-                  transform: "translateY(-4px)",
-                },
+                width: 64,
+                height: 64,
+                borderRadius: "50%",
+                backgroundColor: "rgba(255,255,255,0.15)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: 2,
+                zIndex: 1,
               }}
             >
-              <Stack spacing={1.5}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Typography variant="subtitle2" color="text.secondary">
-                    {stat.title}
-                  </Typography>
-                  <Box
-                    sx={{
-                      width: 36,
-                      height: 36,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: "50%",
-                      bgcolor: `${stat.color}10`,
-                    }}
-                  >
-                    {stat.icon}
-                  </Box>
-                </Box>
+              <Box sx={{ color: "#fff" }}>{stat.icon}</Box>
+            </Box>
 
-                <Typography variant="h5" fontWeight={700}>
-                  {stat.value}
-                </Typography>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                  }}
-                ></Box>
-              </Stack>
-            </Card>
-          </Grid>
+            <Typography
+              variant="h4"
+              fontWeight={700}
+              sx={{ zIndex: 1, lineHeight: 1.2 }}
+            >
+              {stat.value}
+            </Typography>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                opacity: 0.9,
+                zIndex: 1,
+                mt: 0.5,
+                fontWeight: 500,
+                fontSize: "0.9rem",
+              }}
+            >
+              {stat.title}
+            </Typography>
+          </Box>
         ))}
-      </Grid>
+      </Box>
 
       {/* Search and Filters - Modern Layout */}
-      <Card
-        sx={{
-          p: 3,
-          mb: 3,
-          borderRadius: 3,
-          boxShadow: 2,
-        }}
-      >
+      <Card sx={{ p: 3, mb: 4, borderRadius: 3, boxShadow: 2, mt: 2 }}>
         <Stack
           direction={{ xs: "column", md: "row" }}
           spacing={2}
@@ -361,9 +365,7 @@ const BusinessRegistrationDashboard = () => {
                   <Search color="action" />
                 </InputAdornment>
               ),
-              sx: {
-                borderRadius: 2,
-              },
+              sx: { borderRadius: 2 },
             }}
           />
           <Stack direction="row" spacing={2} width={{ xs: "100%", md: "auto" }}>
@@ -385,7 +387,7 @@ const BusinessRegistrationDashboard = () => {
                 borderRadius: 2,
                 px: 3,
                 textTransform: "none",
-                bgcolor: colors.dark,
+                bgcolor: "#212529",
                 "&:hover": {
                   bgcolor: "#343a40",
                 },
