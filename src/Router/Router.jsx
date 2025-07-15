@@ -18,10 +18,10 @@ import Rcd from "../FRONTEND/components/REPORT/RCD/rcd";
 import RptCard from "../FRONTEND/components/REPORT/RPTCARD/realpropertytax_card";
 
 import BusinessRegistration from "../FRONTEND/components/BUSINESS/BusinessRegistration/BusinessRegistration";
-import NewForm from "../FRONTEND/components/BUSINESS/BusinessRegistration/components/BNew";
 import RenewalForm from "../FRONTEND/components/BUSINESS/BusinessRegistration/components/BRenew";
 import BusinessAddress from "../FRONTEND/components/BUSINESS/BusinessRegistration/components/BusinessAdress";
 import BusinessOperation from "../FRONTEND/components/BUSINESS/BusinessRegistration/components/BusinessOperation";
+import NewForm from "../FRONTEND/components/BUSINESS/BusinessRegistration/components/NewFormWrapper";
 import EbikeTrisikad from "../FRONTEND/components/BUSINESS/E-BIKE_TRISIKAD/ebiketrisikad";
 import Mch from "../FRONTEND/components/BUSINESS/MCH/mch";
 import Collection from "../FRONTEND/components/REPORT/Collection/collection";

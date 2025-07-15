@@ -17,7 +17,7 @@ import HouseIcon from "@mui/icons-material/House";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 import ImportExportIcon from "@mui/icons-material/ImportExport";
 import InboxIcon from "@mui/icons-material/Inbox";
-import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+// import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import ScubaDivingIcon from "@mui/icons-material/ScubaDiving";
 import SellIcon from "@mui/icons-material/Sell";
 import SendIcon from "@mui/icons-material/Send";
@@ -70,11 +70,6 @@ const NAVIGATION = [
         segment: "community-tax-certificate",
         title: "Community Tax Certificate",
         icon: <AssignmentIndIcon sx={{ color: "warning.main" }} />,
-      },
-      {
-        segment: "other-income-receipts",
-        title: "Other Income Receipts",
-        icon: <ReceiptLongIcon sx={{ color: "info.main" }} />,
       },
     ],
   },
@@ -183,6 +178,49 @@ const NAVIGATION = [
     segment: "register-user",
     title: "USER REGISTRATION",
     icon: <AppRegistrationIcon sx={{ color: "info.main" }} />,
+  },
+
+  {
+    segment: "template",
+    title: "TEMPLATE",
+    icon: <AppRegistrationIcon sx={{ color: "info.main" }} />,
+    children: [
+      {
+        segment: "email-inbox",
+        title: "VOUCHER",
+        icon: <InboxIcon sx={{ color: "primary.main" }} />,
+      },
+      {
+        segment: "email-sent",
+        title: "RCD GF",
+        icon: <SendIcon sx={{ color: "success.main" }} />,
+      },
+      {
+        segment: "email-sent",
+        title: "RCD SEF",
+        icon: <SendIcon sx={{ color: "success.main" }} />,
+      },
+      {
+        segment: "email-sent",
+        title: "MCH - APPLICATION",
+        icon: <SendIcon sx={{ color: "success.main" }} />,
+      },
+      {
+        segment: "email-sent",
+        title: "MCH - CERTIFICATION",
+        icon: <SendIcon sx={{ color: "success.main" }} />,
+      },
+      {
+        segment: "email-sent",
+        title: "MCH - ORDER",
+        icon: <SendIcon sx={{ color: "success.main" }} />,
+      },
+      {
+        segment: "email-sent",
+        title: "MCH - CLEARANCE",
+        icon: <SendIcon sx={{ color: "success.main" }} />,
+      },
+    ],
   },
   {
     kind: "divider",

@@ -1,55 +1,63 @@
-import { yupResolver } from '@hookform/resolvers/yup';
+import { yupResolver } from "@hookform/resolvers/yup";
 import {
   Box,
   Button,
   FormControl,
   FormHelperText,
-  Grid,
   InputLabel,
   MenuItem,
   Select,
   TextField,
-  Typography
-} from '@mui/material';
-import React from 'react';
-import { Controller, useForm, useWatch } from 'react-hook-form';
-import PhoneInput from 'react-phone-input-2';
-import 'react-phone-input-2/lib/style.css';
-import * as yup from 'yup';
-// import { useNavigate } from 'react-router-dom';
+  Typography,
+} from "@mui/material";
+import PropTypes from "prop-types";
+import React from "react";
+import Col from "react-bootstrap/Col";
+import Form from "react-bootstrap/Form";
+import Row from "react-bootstrap/Row";
+import { Controller, useForm, useWatch } from "react-hook-form";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import * as yup from "yup";
 
+const typesRequiringRegistrationNo = [
+  "Cooperative",
+  "Corporation",
+  "One Person Corporation",
+  "Partnership",
+  "Sole Proprietorship",
+];
 
 function BusinessForm({ handleNext }) {
-  const businessTypesWithGender = ['One Person Corporation', 'Sole Proprietorship'];
-  // const navigate = useNavigate(); // Initialize navigate function
-
+  const businessTypesWithGender = [
+    "One Person Corporation",
+    "Sole Proprietorship",
+  ];
   const schema = yup.object().shape({
-    businessType: yup.string().required('Business Type is required'),
-    registrationNo: yup
-      .string()
-      .test(
-        'is-required-based-on-businessType',
-        'Registration No. is required',
-        function (value) {
-          const { businessType } = this.parent;
-          const typesRequiringRegistrationNo = [
-            'Cooperative',
-            'Corporation',
-            'One Person Corporation',
-            'Partnership',
-            'Sole Proprietorship',
-          ];
-          return typesRequiringRegistrationNo.includes(businessType) ? !!value : true;
+    businessType: yup.string().required("Business Type is required"),
+
+    registrationNo: yup.string().test(
+      "is-required-based-on-businessType",
+      "Registration No. is required",
+      // Use `function` for Yup context
+      function (value) {
+        /* eslint-disable-next-line react/no-this-in-sfc */
+        const { businessType } = this.parent;
+        if (typesRequiringRegistrationNo.includes(businessType)) {
+          return !!value;
         }
-      ),
-    businessName: yup.string().required('Business Name is required'),
-    firstName: yup.string().required('First Name is required'),
-    lastName: yup.string().required('Last Name is required'),
-    nationality: yup.string().required('Country of Citizenship is required'),
+        return true;
+      }
+    ),
+
+    businessName: yup.string().required("Business Name is required"),
+    firstName: yup.string().required("First Name is required"),
+    lastName: yup.string().required("Last Name is required"),
+
     emailAddress: yup
       .string()
-      .email('Invalid email')
-      .required('E-Mail Address is required'),
+      .email("Invalid email")
+      .required("E-Mail Address is required"),
   });
 
   const {
@@ -63,51 +71,53 @@ function BusinessForm({ handleNext }) {
 
   const businessType = useWatch({
     control,
-    name: 'businessType',
+    name: "businessType",
   });
 
   const onSubmit = (data) => {
-    // Handle form submission logic here
-    console.log(data);
+    console.log("Form submitted:", data);
     handleNext();
   };
 
-  const isOwnerGenderApplicable = businessTypesWithGender.includes(businessType);
+  const isOwnerGenderApplicable =
+    businessTypesWithGender.includes(businessType);
 
   React.useEffect(() => {
     if (!isOwnerGenderApplicable) {
-      setValue('ownerGender', '');
+      setValue("ownerGender", "");
     }
   }, [isOwnerGenderApplicable, setValue]);
 
   return (
     <Box
       sx={{
-        backgroundColor: '#FFFFFF',
-        backgroundImage: 'url("https://ucarecdn.com/4594b137-724c-4041-a614-43a973a69812/")',
-        backgroundRepeat: 'repeat-x',
-        backgroundPosition: 'left bottom',
-        minHeight: '650px',
-        padding: '2rem',
+        backgroundColor: "#FFFFFF",
+        backgroundImage:
+          'url("https://ucarecdn.com/4594b137-724c-4041-a614-43a973a69812/")',
+        backgroundRepeat: "repeat-x",
+        backgroundPosition: "left bottom",
+        minHeight: "650px",
+        padding: "2rem",
       }}
     >
       <Box maxWidth="lg" mx="auto">
         {/* Form Header */}
-        <Typography variant="h5"
-  align="left" // Align to the left
-  gutterBottom
-  sx={{
-    fontWeight: "bold",
-    color: "#1976d2",
-    marginBottom: "1rem", // Adjust spacing
-  }}>
+        <Typography
+          variant="h5"
+          align="left" // Align to the left
+          gutterBottom
+          sx={{
+            fontWeight: "bold",
+            color: "#1976d2",
+            marginBottom: "1rem", // Adjust spacing
+          }}
+        >
           Business Information and Registration
         </Typography>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container spacing={2}>
-            {/* Business Type */}
-            <Grid item xs={12} md={6}>
+        <Form onSubmit={handleSubmit(onSubmit)}>
+          <Row className="g-3 mb-4">
+            <Col>
               <FormControl fullWidth error={!!errors.businessType}>
                 <InputLabel id="business-type-label">Business Type</InputLabel>
                 <Controller
@@ -115,39 +125,43 @@ function BusinessForm({ handleNext }) {
                   control={control}
                   defaultValue=""
                   render={({ field }) => (
-                    <Select {...field} labelId="business-type-label" label="Business Type">
+                    <Select
+                      {...field}
+                      labelId="business-type-label"
+                      label="Business Type"
+                    >
                       <MenuItem value="">
                         <em>Select Business Type</em>
                       </MenuItem>
                       <MenuItem value="Cooperative">Cooperative</MenuItem>
                       <MenuItem value="Corporation">Corporation</MenuItem>
-                      <MenuItem value="One Person Corporation">One Person Corporation</MenuItem>
+                      <MenuItem value="One Person Corporation">
+                        One Person Corporation
+                      </MenuItem>
                       <MenuItem value="Partnership">Partnership</MenuItem>
-                      <MenuItem value="Sole Proprietorship">Sole Proprietorship</MenuItem>
+                      <MenuItem value="Sole Proprietorship">
+                        Sole Proprietorship
+                      </MenuItem>
                     </Select>
                   )}
                 />
                 <FormHelperText>{errors.businessType?.message}</FormHelperText>
               </FormControl>
-            </Grid>
+            </Col>
 
-
-            {/* Owner's Gender */}
-            <Grid item xs={12} md={6}>
-              <FormControl
-                fullWidth
-              >
-                <InputLabel id="owner-gender-label">
-                  Owner's Gender
-                </InputLabel>
+            <Col>
+              <FormControl fullWidth>
+                <InputLabel id="owner-gender-label">Owner's Gender</InputLabel>
                 <Controller
                   name="ownerGender"
                   control={control}
                   defaultValue=""
                   render={({ field }) => (
                     <Select
+                      {...field}
                       labelId="owner-gender-label"
                       label="Owner's Gender"
+                      disabled={!isOwnerGenderApplicable} // <-- DISABLE here directly!
                     >
                       <MenuItem value="">
                         <em>Select</em>
@@ -158,30 +172,31 @@ function BusinessForm({ handleNext }) {
                   )}
                 />
               </FormControl>
-            </Grid>
+            </Col>
+          </Row>
 
-            {/* Dynamic Registration No. */}
-            <Grid item xs={12} md={6}>
+          <Row className="g-3 mb-4">
+            <Col>
               <Controller
                 name="registrationNo"
                 control={control}
                 defaultValue=""
                 render={({ field }) => {
-                  let label = '';
+                  let label = "";
                   switch (businessType) {
-                    case 'Cooperative':
-                      label = 'CDA Registration No.';
+                    case "Cooperative":
+                      label = "CDA Registration No.";
                       break;
-                    case 'Corporation':
-                    case 'One Person Corporation':
-                    case 'Partnership':
-                      label = 'SEC Registration No.';
+                    case "Corporation":
+                    case "One Person Corporation":
+                    case "Partnership":
+                      label = "SEC Registration No.";
                       break;
-                    case 'Sole Proprietorship':
-                      label = 'DTI Registration No.';
+                    case "Sole Proprietorship":
+                      label = "DTI Registration No.";
                       break;
                     default:
-                      label = 'Registration No.';
+                      label = "Registration No.";
                   }
                   return (
                     <TextField
@@ -191,15 +206,18 @@ function BusinessForm({ handleNext }) {
                       variant="outlined"
                       fullWidth
                       error={!!errors.registrationNo}
-                      helperText={errors.registrationNo ? errors.registrationNo.message : ''}
+                      helperText={
+                        errors.registrationNo
+                          ? errors.registrationNo.message
+                          : ""
+                      }
                     />
                   );
                 }}
               />
-            </Grid>
+            </Col>
 
-            {/* Business Name */}
-            <Grid item xs={12} md={6}>
+            <Col>
               <Controller
                 name="businessName"
                 control={control}
@@ -212,21 +230,29 @@ function BusinessForm({ handleNext }) {
                     fullWidth
                     required
                     error={!!errors.businessName}
-                    helperText={errors.businessName ? errors.businessName.message : ''}
+                    helperText={
+                      errors.businessName ? errors.businessName.message : ""
+                    }
                   />
                 )}
               />
-            </Grid>
+            </Col>
+          </Row>
 
-            {/* Owner's Name Section Header */}
-            <Grid item xs={12}>
-              <Typography variant="h5" gutterBottom sx={{ marginTop: '2rem', fontWeight: 'bold', color: '#050505',  }}>
+          <Row>
+            <Col>
+              <Typography
+                variant="h5"
+                gutterBottom
+                sx={{ marginTop: "2rem", fontWeight: "bold", color: "#050505" }}
+              >
                 Owner's Name
               </Typography>
-            </Grid>
+            </Col>
+          </Row>
 
-            {/* First Name */}
-            <Grid item xs={12} md={6}>
+          <Row className="g-3 mb-4">
+            <Col>
               <Controller
                 name="firstName"
                 control={control}
@@ -239,24 +265,26 @@ function BusinessForm({ handleNext }) {
                     fullWidth
                     required
                     error={!!errors.firstName}
-                    helperText={errors.firstName ? errors.firstName.message : ''}
+                    helperText={
+                      errors.firstName ? errors.firstName.message : ""
+                    }
                   />
                 )}
               />
-            </Grid>
+            </Col>
 
-            {/* Middle Name */}
-            <Grid item xs={12} md={6}>
+            <Col>
               <TextField
                 label="Middle Name (Optional)"
                 variant="outlined"
                 fullWidth
                 name="middleName"
               />
-            </Grid>
+            </Col>
+          </Row>
 
-            {/* Last Name */}
-            <Grid item xs={12} md={6}>
+          <Row className="g-3 mb-4">
+            <Col>
               <Controller
                 name="lastName"
                 control={control}
@@ -269,14 +297,13 @@ function BusinessForm({ handleNext }) {
                     fullWidth
                     required
                     error={!!errors.lastName}
-                    helperText={errors.lastName ? errors.lastName.message : ''}
+                    helperText={errors.lastName ? errors.lastName.message : ""}
                   />
                 )}
               />
-            </Grid>
+            </Col>
 
-            {/* Extension Name */}
-            <Grid item xs={12} md={6}>
+            <Col>
               <FormControl fullWidth>
                 <InputLabel id="suffix-name-label">Extension Name</InputLabel>
                 <Controller
@@ -300,147 +327,144 @@ function BusinessForm({ handleNext }) {
                   )}
                 />
               </FormControl>
-            </Grid>
-          
+            </Col>
+          </Row>
 
-         {/* Contact Information Section Header */}
-<Grid item xs={12}>
-  <Typography
-    variant="h5"
-    gutterBottom
-    sx={{
-      marginTop: '2rem',
-      fontWeight: 'bold',
-      textAlign: 'center',
-      color: '#050505', 
-    }}
-  >
-    Contact Information
-  </Typography>
-</Grid>
+          <Row>
+            <Col>
+              <Typography
+                variant="h5"
+                gutterBottom
+                sx={{
+                  marginTop: "2rem",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  color: "#050505",
+                }}
+              >
+                Contact Information
+              </Typography>
+            </Col>
+          </Row>
 
-{/* E-Mail Address */}
-<Grid item xs={12} md={6}>
-  <Controller
-    name="emailAddress"
-    control={control}
-    defaultValue=""
-    render={({ field }) => (
-      <TextField
-        {...field}
-        label="E-Mail Address"
-        variant="outlined"
-        fullWidth
-        required
-        error={!!errors.emailAddress}
-        helperText={errors.emailAddress ? errors.emailAddress.message : ''}
-      />
-    )}
-  />
-</Grid>
+          <Row className="g-3 mb-4">
+            <Col>
+              <Controller
+                name="emailAddress"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="E-Mail Address"
+                    variant="outlined"
+                    fullWidth
+                    required
+                    error={!!errors.emailAddress}
+                    helperText={
+                      errors.emailAddress ? errors.emailAddress.message : ""
+                    }
+                  />
+                )}
+              />
+            </Col>
 
-{/* Telephone Number */}
-<Grid item xs={12} md={6}>
-  <Controller
-    name="cellphoneNo"
-    control={control}
-    defaultValue="+63"
-    render={({ field }) => (
-      <Box sx={{ width: '100%', position: 'relative' }}>
-        <PhoneInput
-  country="ph"
-  onlyCountries={['ph']}
-  // This custom mask says: 
-  // "take 3 digits, space, 3 digits, space, 4 digits" 
-  // for the part after +63
-  masks={{
-    ph: '... ... ....'
-  }}
+            <Col>
+              <Controller
+                name="cellphoneNo"
+                control={control}
+                defaultValue="+63"
+                render={({ field }) => (
+                  <Box sx={{ width: "100%", position: "relative" }}>
+                    <PhoneInput
+                      country="ph"
+                      onlyCountries={["ph"]}
+                      masks={{ ph: "... ... ...." }}
+                      countryCodeEditable={false}
+                      containerStyle={{ width: "100%", borderRadius: "4px" }}
+                      inputStyle={{
+                        width: "100%",
+                        height: "56px",
+                        fontSize: "16px",
+                        paddingLeft: "48px",
+                        borderRadius: "4px",
+                        border: "1px solid rgba(0, 0, 0, 0.23)",
+                        backgroundColor: "transparent",
+                        color: "#333",
+                        outline: "none",
+                      }}
+                      buttonStyle={{
+                        border: "none",
+                        background: "transparent",
+                        position: "absolute",
+                        top: "50%",
+                        left: "8px",
+                        transform: "translateY(-50%)",
+                      }}
+                      dropdownStyle={{
+                        borderRadius: "8px",
+                        boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                      }}
+                      // FIX: Proper binding to react-hook-form
+                      value={field.value}
+                      onChange={(phone) => field.onChange(phone)}
+                    />
+                    {errors.cellphoneNo && (
+                      <FormHelperText sx={{ color: "red" }}>
+                        {errors.cellphoneNo.message}
+                      </FormHelperText>
+                    )}
+                  </Box>
+                )}
+              />
+            </Col>
+          </Row>
 
-  // Prevent users from deleting "+63"
-  countryCodeEditable={false}
-  
-  // Styling, etc.
-  containerStyle={{
-    width: '100%',
-    borderRadius: '4px',
-  }}
-  inputStyle={{
-    width: '100%',
-    height: '56px',
-    fontSize: '16px',
-    paddingLeft: '48px',
-    borderRadius: '4px',
-    border: '1px solid rgba(0, 0, 0, 0.23)',
-    backgroundColor: 'transparent',
-    color: '#333',
-    outline: 'none',
-  }}
-  buttonStyle={{
-    border: 'none',
-    background: 'transparent',
-    position: 'absolute',
-    top: '50%',
-    left: '8px',
-    transform: 'translateY(-50%)',
-  }}
-  dropdownStyle={{
-    borderRadius: '8px',
-    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-  }}
-/>
-        {errors.cellphoneNo && (
-          <FormHelperText sx={{ color: 'red' }}>
-            {errors.cellphoneNo.message}
-          </FormHelperText>
-        )}
-      </Box>
-    )}
-  />
-</Grid>
+          <Row className="g-3 mb-4">
+            <Col>
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                sx={{
+                  backgroundColor: "#323232",
+                  color: "#FFFFFF",
+                  "&:hover": {
+                    backgroundColor: "#505050",
+                  },
+                  height: "56px", // Match TextField height
+                  fontSize: "16px",
+                }}
+              >
+                Next
+              </Button>
+            </Col>
 
-{/* Buttons */}
-<Grid container spacing={2} sx={{ marginTop: '2rem' }}>
-  <Grid item xs={12} md={6}>
-    <Button
-      type="submit"
-      variant="contained"
-      fullWidth
-      sx={{
-        backgroundColor: '#323232',
-        color: '#FFFFFF',
-        '&:hover': {
-          backgroundColor: '#505050',
-        },
-        height: '56px', // Match TextField height
-        fontSize: '16px',
-      }}
-    >
-      Next
-    </Button>
-  </Grid>
-  <Grid item xs={12} md={6}>
-    <Button
-      type="button"
-      variant="outlined"
-      fullWidth
-      sx={{
-        height: '56px', // Match TextField height
-        fontSize: '16px',
-      }}
-      onClick={() => {
-        // Handle cancel action here
-      }}
-    >
-      Cancel
-    </Button>
-  </Grid>
-</Grid>
-          </Grid>
-        </form>
+            <Col>
+              <Button
+                type="button"
+                variant="outlined"
+                fullWidth
+                sx={{
+                  height: "56px", // Match TextField height
+                  fontSize: "16px",
+                }}
+                onClick={() => {
+                  // Handle cancel action here
+                }}
+              >
+                Cancel
+              </Button>
+            </Col>
+          </Row>
+        </Form>
       </Box>
     </Box>
   );
 }
+
+BusinessForm.propTypes = {
+  handleNext: PropTypes.func.isRequired,
+};
 
 export default BusinessForm;

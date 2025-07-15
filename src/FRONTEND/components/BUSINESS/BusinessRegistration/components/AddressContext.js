@@ -1,15 +1,15 @@
-import React, { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState } from "react";
 
 const AddressContext = createContext();
 
 export const AddressProvider = ({ children }) => {
   const [businessAddress, setBusinessAddress] = useState({
-    region: '',
-    province: '',
-    municipality: '',
-    barangay: '',
-    address: '',
-    zipCode: '',
+    region: "",
+    province: "",
+    municipality: "",
+    barangay: "",
+    addressDetails: "",
+    zipCode: "",
   });
 
   return (
