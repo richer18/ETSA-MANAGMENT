@@ -35,6 +35,7 @@ import { DemoProvider } from "@toolpad/core/internal";
 import PropTypes from "prop-types";
 import * as React from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import TaxCollected from "./components/CHARTS/TaxCollected";
 import "./system.css";
 
 const NAVIGATION = [
@@ -412,7 +413,7 @@ function DashboardHome() {
       <header className="dashboard-header">
         <div className="header-content">
           <h1>Treasurer's Dashboard</h1>
-          <p>Municipal Treasurer Office • As of October 15, 2023</p>
+          <p>Municipal Treasurer Office • As of 2025</p>
         </div>
         <div className="header-actions">
           <button className="filter-btn">
@@ -446,14 +447,14 @@ function DashboardHome() {
       <Box sx={{ width: "100%" }}>
         <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
           <Grid size={4}>
-            <Item>Total Tax Collected</Item>
+            <TaxCollected />
           </Grid>
           <Grid size={4}>
             <Item>Total this month</Item>
           </Grid>
-          <Grid size={4}>
+          {/* <Grid size={4}>
             <Item>Total this day</Item>
-          </Grid>
+          </Grid> */}
           <Grid size={4}>
             <Item>Business</Item>
           </Grid>
