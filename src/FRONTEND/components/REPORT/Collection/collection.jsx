@@ -20,6 +20,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import * as XLSX from "xlsx";
 import axiosInstance from "../../../../api/axiosInstance";
 
+import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+
 const months = [
   { label: "January", value: "1" },
   { label: "February", value: "2" },
@@ -743,99 +747,106 @@ function Collection() {
   useEffect(() => {
     const style = document.createElement("style");
     style.innerHTML = `
-        @media print {
-          @page {
-            size: 8.5in 13in portrait;
-            margin: 10mm;
-          }
+    @media print {
+      @page {
+        size: 8.5in 13in portrait;
+        margin: 10mm;
+      }
 
-          body * {
-            visibility: hidden;
-          }
+      body * {
+        visibility: hidden;
+      }
 
-          #printableArea, #printableArea * {
-            visibility: visible;
-          }
+      #printableArea, #printableArea * {
+        visibility: visible;
+      }
 
-          #printableArea {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-          }
+      #printableArea {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        display: block;
+        /* Removed position: absolute to allow natural flow */
+      }
 
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: Arial, sans-serif;
-            font-size: 10px;
-          }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
+        font-size: 10px;
+        page-break-inside: auto;
+      }
 
-          th, td {
-            border: 1px solid black;
-            padding: 6px;
-            text-align: center;
-          }
+      th, td {
+        border: 1px solid black;
+        padding: 6px;
+        text-align: center;
+      }
 
-          th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-            font-size: 11px;
-          }
+      th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+        font-size: 11px;
+      }
 
-          h6, .subtitle {
-            font-size: 12px;
-            text-align: center;
-            font-weight: bold;
-            margin: 6px 0;
-            font-family: Arial, sans-serif;
-          }
+      h6, .subtitle {
+        font-size: 12px;
+        text-align: center;
+        font-weight: bold;
+        margin: 6px 0;
+        font-family: Arial, sans-serif;
+      }
 
-          tr {
-            page-break-inside: avoid;
-          }
+      tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+      }
 
-          .custom-footer {
-            text-align: center;
-            font-size: 10px;
-            margin-top: 10mm;
-            font-family: Arial, sans-serif;
-            position: relative;
-            bottom: 0;
-          }
+      .custom-footer {
+        text-align: center;
+        font-size: 10px;
+        margin-top: 10mm;
+        font-family: Arial, sans-serif;
+      }
 
-          .page-break {
-            display: block;
-            page-break-after: always;
-            break-after: page;
-            height: 0;
-            visibility: hidden;
-          }
+      .page-break {
+        display: block;
+        page-break-after: always;
+        break-after: page;
+        height: 0;
+        visibility: hidden;
+      }
 
-          /* Adjust column widths */
-          th:nth-child(1), td:nth-child(1)   { width: 18%; }
-          th:nth-child(2), td:nth-child(2)   { width: 14%; }
-          th:nth-child(3), td:nth-child(3)   { width: 10%; }
-          th:nth-child(4), td:nth-child(4)   { width: 9%; }
-          th:nth-child(5), td:nth-child(5)   { width: 9%; }
-          th:nth-child(6), td:nth-child(6)   { width: 9%; }
-          th:nth-child(7), td:nth-child(7)   { width: 9%; }
-          th:nth-child(8), td:nth-child(8)   { width: 9%; }
-          th:nth-child(9), td:nth-child(9)   { width: 9%; }
-          th:nth-child(10), td:nth-child(10) { width: 9%; }
-          th:nth-child(11), td:nth-child(11) { width: 6%; }
-          th:nth-child(12), td:nth-child(12) { width: 6%; }
-        }
-      `;
+      /* Adjust column widths */
+      th:nth-child(1), td:nth-child(1)   { width: 18%; }
+      th:nth-child(2), td:nth-child(2)   { width: 14%; }
+      th:nth-child(3), td:nth-child(3)   { width: 10%; }
+      th:nth-child(4), td:nth-child(4)   { width: 9%; }
+      th:nth-child(5), td:nth-child(5)   { width: 9%; }
+      th:nth-child(6), td:nth-child(6)   { width: 9%; }
+      th:nth-child(7), td:nth-child(7)   { width: 9%; }
+      th:nth-child(8), td:nth-child(8)   { width: 9%; }
+      th:nth-child(9), td:nth-child(9)   { width: 9%; }
+      th:nth-child(10), td:nth-child(10) { width: 9%; }
+      th:nth-child(11), td:nth-child(11) { width: 6%; }
+      th:nth-child(12), td:nth-child(12) { width: 6%; }
+    }
+  `;
     document.head.appendChild(style);
-    return () => document.head.removeChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
   }, []);
 
   const handlePrint = () => {
     const originalTitle = document.title;
     document.title = `SOC_GeneralFundReport_${month.label}_${year.label}`;
-    window.print();
-    document.title = originalTitle; // Restore original title
+
+    setTimeout(() => {
+      window.print();
+      document.title = originalTitle;
+    }, 300); // Short delay ensures DOM fully rendered
   };
 
   const generateHeaders = () => {
@@ -1235,6 +1246,7 @@ function Collection() {
           />
         </Box>
       </Box>
+
       <div id="printableArea">
         <Box>
           <Box>
@@ -5680,6 +5692,99 @@ function Collection() {
                 </TableBody>
               </Table>
             </TableContainer>
+            <Box sx={{ p: 4, position: "relative" }}>
+              <Container>
+                <Row>
+                  <Col>
+                    {" "}
+                    <Box
+                      sx={{
+                        position: "relative",
+                        height: "100%",
+                      }}
+                    >
+                      <Typography
+                        variant="body1"
+                        fontWeight="bold"
+                        sx={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                        }}
+                      >
+                        PREPARED BY:
+                      </Typography>
+
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          top: 40,
+                          left: 110,
+                          textAlign: "left",
+                        }}
+                      >
+                        <Typography variant="body1" fontWeight="bold">
+                          RICHER T. ALANANO
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            mt: 0.5,
+                            color: "text.secondary",
+                            pl: 4,
+                          }}
+                        >
+                          CASUAL-IT
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Col>
+                  <Col>
+                    <Box
+                      sx={{
+                        position: "relative",
+                        height: "100%",
+                      }}
+                    >
+                      <Typography
+                        variant="body1"
+                        fontWeight="bold"
+                        sx={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                        }}
+                      >
+                        CERTIFIED CORRECT:
+                      </Typography>
+
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          top: 40,
+                          left: 170,
+                          textAlign: "left",
+                        }}
+                      >
+                        <Typography variant="body1" fontWeight="bold">
+                          PAUL REE AMBROSE A. MARTINEZ
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            mt: 0.5,
+                            color: "text.secondary",
+                            pl: 8,
+                          }}
+                        >
+                          Municipal Treasurer
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Col>
+                </Row>
+              </Container>
+            </Box>
           </Box>
         </Box>
       </div>
@@ -5691,7 +5796,7 @@ function Collection() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          mt: 2,
+          mt: 10,
           mb: 4,
           p: 3,
           bgcolor: "background.paper",
