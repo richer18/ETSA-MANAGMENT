@@ -43,8 +43,6 @@ const years = [
   { label: "2027", value: "2027" },
 ];
 
-
-
 function ReportTable({ onBack }) {
   const [month, setMonth] = useState({ label: "January", value: "1" });
   const [year, setYear] = useState({ label: "2025", value: "2025" });
@@ -418,7 +416,7 @@ function ReportTable({ onBack }) {
 
     XLSX.writeFile(workbook, `SOCRPT_${month.label}_${year.label}.xlsx`);
   };
- 
+
   return (
     <>
       <Box
